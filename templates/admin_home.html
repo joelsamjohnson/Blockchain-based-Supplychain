@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block heading %} Textile Supply Chain Flow {% endblock heading %}
+{% block content %}
+<div class="container">
+  <div class="register">
+    <h6>(Note: Here <u>Owner</u> is the person who deployed the smart contract on the blockchain)</h6>
+    <h5>Step 1: Owner Should Register Raw material suppliers, Manufacturers, Distributors and Retailers</h5>
+    <h6>(Note: This is a one-time step. Skip to step 2 if already done)</h6>
+    <a href="{% url 'register_roles' %}" class="btn btn-outline-primary btn-sm">Register</a>
+  </div>
+  <br />
+  <div class="orderproducts">
+    <h5>Step 2: Owner should order products</h5>
+    <a href="{% url 'add_product' %}" class="btn btn-outline-primary btn-sm">Order Products</a>
+  </div>
+  <br />
+  <div class="controlchain">
+    <h5>Step 3: Control Supply Chain</h5>
+    <a href="{% url 'supply' %}" class="btn btn-outline-primary btn-sm">Control Supply Chain</a>
+  </div>
+  <br />
+  <div class="track">
+    <h5><b>Track</b> the products:</h5>
+    <a href="{% url 'track' %}" class="btn btn-outline-primary btn-sm">Track Products</a>
+  </div>
+</div>
+{% endblock %}
+{% block something %}{% endblock something %}

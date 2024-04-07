@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block heading %}View Product Details{% endblock heading %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        
+
+
+        <div class="card overflow-hidden rounded-2">
+            <div class="card-body" id="productDetails">
+                <!-- Product Details -->
+                <h6 class="fw-semibold" id="productName">Product Name</h6>
+                <p id="productDescription">Product Description</p>
+                <!-- Supplier Details -->
+                Raw Material Supplier
+                <p id="supplierDetails">Supplier: Loading...</p>
+                <!-- Manufacturer Details -->
+                Manufacturer
+                <p id="manufacturerDetails">Manufacturer: Loading...</p>
+                <!-- Distributor Details -->
+                Distributor
+                <p id="distributorDetails">Distributor: Loading...</p>
+                <!-- Retailer Details -->
+                Retailer
+                <p id="retailerDetails">Retailer: Loading...</p>
+                <!-- Processing Stage -->
+                <b id="processingStage">Current Processing Stage: Loading...</b>
+                
+              
+            </div>
+        </div>
+        <div>
+            <div>
+                <form action="{% url 'show_product_stage' product_id=0 %}" method="GET" id="productIDForm">
+                    <label for="productIDInput">Enter Product ID:</label>
+                    <input type="number" class="form-control" id="productIDInput" name="productID" required><br>
+                    <button type="submit" class="btn btn-primary" id="viewProductButton">View Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+
+<script>
+    let contract;
+    let web3;
+
+
+   async function loadABI() {
+      const response = await fetch('./contracts/myContractABI.json');
+      const abi = await response.json();
+  }
+    const contractAddress = '0xFE8dd0108F2120998b31F236F1435D090C1f3d1c';
+
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+    } else {
+        console.error("Please install MetaMask!");
+    }
+
+    async function initWeb3() {
+        if (window.ethereum) {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("Web3 initialized and accounts requested.");
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+                console.log("Contract initialized with web3.js");
+            } catch (error) {
+                console.error("Could not get accounts", error);
+            }
+        } else {
+            console.error("Ethereum object not found. Make sure you have a web3 provider.");
+        }
+    }
+
+    function showProductDetails() {
+        const productID = document.getElementById("productIDInput").value;
+        fetch(`/show-product-stage/${productID}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('productName').textContent = data.product_name;
+            document.getElementById('productDescription').textContent = data.product_description;
+
+            // Using innerHTML for line breaks, ensure data is sanitized to avoid XSS
+            document.getElementById('supplierDetails').innerHTML = `Name: ${data.RMSname} <br> Place: ${data.RMSplace}`;
+            document.getElementById('manufacturerDetails').innerHTML = `Name: ${data.MANname} <br> Place: ${data.MANplace}`;
+            document.getElementById('distributorDetails').innerHTML = `Name: ${data.DISname} <br> Place: ${data.DISplace}`;
+            document.getElementById('retailerDetails').innerHTML = `Name: ${data.RETname} <br> Place: ${data.RETplace}`;
+            document.getElementById('processingStage').innerHTML = data.processing_stage;
+        })
+        .catch(error => console.error('Error fetching product details:', error));
+    }
+
+
+    window.addEventListener('load', async () => {
+        await loadABI();
+        await initWeb3();
+    });
+
+    document.getElementById('viewProductButton').addEventListener('click', function(event) {
+        event.preventDefault();
+        showProductDetails(); 
+    });
+
+
+
+    document.getElementById('productIDInput').addEventListener('change', function() {
+        var baseActionURL = "/show-product-stage/"; // Base URL defined
+        document.getElementById('productIDForm').action = baseActionURL + this.value + '/';
+    });
+
+
+</script>
+
+{% endblock content %}
+
+<div class="row">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card overflow-hidden rounded-2">
+            <div class="position-relative">
+                <a href="javascript:void(0)"><img src="../assets/images/products/s4.jpg" class="card-img-top rounded-0"
+                        alt="..."></a>
+                <a href="javascript:void(0)"
+                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
+                        class="ti ti-basket fs-4"></i></a>
+            </div>
+            <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Boat Headphone</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-semibold fs-4 mb-0">$50 <span
+                            class="ms-2 fw-normal text-muted fs-3"><del>$65</del></span></h6>
+                    <ul class="list-unstyled d-flex align-items-center mb-0">
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card overflow-hidden rounded-2">
+            <div class="position-relative">
+                <a href="javascript:void(0)"><img src="../assets/images/products/s5.jpg" class="card-img-top rounded-0"
+                        alt="..."></a>
+                <a href="javascript:void(0)"
+                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
+                        class="ti ti-basket fs-4"></i></a>
+            </div>
+            <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">MacBook Air Pro</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-semibold fs-4 mb-0">$650 <span
+                            class="ms-2 fw-normal text-muted fs-3"><del>$900</del></span></h6>
+                    <ul class="list-unstyled d-flex align-items-center mb-0">
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card overflow-hidden rounded-2">
+            <div class="position-relative">
+                <a href="javascript:void(0)"><img src="../assets/images/products/s7.jpg" class="card-img-top rounded-0"
+                        alt="..."></a>
+                <a href="javascript:void(0)"
+                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
+                        class="ti ti-basket fs-4"></i></a>
+            </div>
+            <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Red Valvet Dress</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-semibold fs-4 mb-0">$150 <span
+                            class="ms-2 fw-normal text-muted fs-3"><del>$200</del></span></h6>
+                    <ul class="list-unstyled d-flex align-items-center mb-0">
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card overflow-hidden rounded-2">
+            <div class="position-relative">
+                <a href="javascript:void(0)"><img src="../assets/images/products/s11.jpg" class="card-img-top rounded-0"
+                        alt="..."></a>
+                <a href="javascript:void(0)"
+                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
+                        class="ti ti-basket fs-4"></i></a>
+            </div>
+            <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">Cute Soft Teddybear</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-semibold fs-4 mb-0">$285 <span
+                            class="ms-2 fw-normal text-muted fs-3"><del>$345</del></span></h6>
+                    <ul class="list-unstyled d-flex align-items-center mb-0">
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="py-6 px-6 text-center">
+    <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank"
+            class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a
+            href="https://themewagon.com">ThemeWagon</a></p>
+</div>

@@ -1,0 +1,86 @@
+{% extends 'base user.html' %}
+{% block heading %}View Orders{% endblock heading %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row"></div> <!-- Products will be loaded into this row -->
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+
+<script>
+    async function loadABI() {
+        const response = await fetch('./contracts/myContractABI.json');
+        const abi = await response.json();
+    }
+
+    let contract;
+    const web3 = new Web3(window.ethereum);
+    let currentAccount = null;
+
+    async function initWeb3() {
+    if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        console.log("Web3 initialized.");
+        try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log("Accounts requested.");
+            const accounts = await web3.eth.getAccounts();
+            console.log("Accounts retrieved:", accounts);
+            if (accounts.length > 0) {
+                currentAccount = accounts[0];
+                console.log("Current Account:", currentAccount);
+                document.getElementById('currentAccount').innerText = `${currentAccount}`;
+                contract = new web3.eth.Contract(contractABI, '0xFE8dd0108F2120998b31F236F1435D090C1f3d1c');
+                console.log("Contract initialized:", contract);
+            } else {
+                console.error("No accounts found.");
+            }
+        } catch (error) {
+            console.error("Could not get accounts", error);
+        }
+    } else {
+        console.error("Ethereum object not found. Make sure you have a web3 provider.");
+    }
+}
+
+
+    async function loadProducts() {
+        const products = await contract.methods.getProductsByUserType(currentAccount).call();
+        const productsContainer = document.querySelector('.row');
+        productsContainer.innerHTML = ''; // Clear existing products
+
+        products.forEach(product => {
+        const productHtml = `
+            <div class="col-sm-6 col-xl-3">
+            <div class="card overflow-hidden rounded-2">
+                <div class="position-relative">
+                <a href="javascript:void(0)"><img src="${product.image}" class="card-img-top rounded-0" alt="..."></a>
+                <a href="javascript:void(0)" class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i class="ti ti-basket fs-4"></i></a>
+                </div>
+                <div class="card-body pt-3 p-4">
+                <h6 class="fw-semibold fs-4">${product.name}</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-semibold fs-4 mb-0">$${product.price} <span class="ms-2 fw-normal text-muted fs-3"><del>$${product.originalPrice}</del></span></h6>
+                    <!-- Dynamically generate stars based on rating -->
+                </div>
+                </div>
+            </div>
+            </div>
+        `;
+
+        productsContainer.innerHTML += productHtml;
+        });
+    }
+
+    window.addEventListener('load', async () => {
+        await initWeb3();
+        await loadProducts(); // Load and display the products after initializing Web3
+    });
+
+
+// Add more functions to interact with your contract as needed
+
+</script>
+{% endblock content %}

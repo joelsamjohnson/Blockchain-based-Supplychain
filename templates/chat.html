@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block heading %}Chat with User{% endblock heading %}
+{% block something %}{% endblock something %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <form method="get" action="{% url 'user_search' %}">
+      <input type="text"  class="form-control" name="query" placeholder="Search users...">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <div class="span12">
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon"><i class="icon-th"></i></span>
+          <h5> </h5>
+        </div>
+        <div class="widget-content nopadding">
+          <table class="table table-bordered data-table">
+            <thead>
+              <tr>
+                <th>Name </th>
+                <th>Chat</th>
+              </tr>
+            </thead>
+            {% if users %}
+
+            <tbody>
+              {% for user in users %}
+
+              <tr class="gradeX">
+                <td>{{user.name}}</td>
+                <td>
+                  <a href="{% url 'chatadmin' user.id %}">View chat</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            {% else %}
+              <td>No users found.</p>
+            {% endif %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock content %}
