@@ -13,7 +13,7 @@
       <div class="card">
         <div class="card-body">
           <div class="row">
-            {% if user.user_type in "Supplier,Manufacturer,Distributor" %}
+            {% if user.user_type in "Manufacturer,Distributor,Retailer" %}
             <div class="col-md-4">
               <div class="card">
                 <img src="{% static 'images/products/s1.jpg' %}" class="card-img-top" alt="...">
@@ -61,12 +61,7 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.3.0/dist/web3.min.js"></script>
 
 <script>
-  async function loadABI() {
-      const response = await fetch('./contracts/myContractABI.json');
-      const abi = await response.json();
-      console.log("ABI loaded:", abi);
-  }
-
+ 
   let contract;
   const web3 = new Web3(window.ethereum);
   let currentAccount = null;
@@ -84,7 +79,7 @@
               currentAccount = accounts[0];
               console.log("Current Account:", currentAccount);
               document.getElementById('currentAccount').innerText = `${currentAccount}`;
-              contract = new web3.eth.Contract(contractABI, '0x2fbd267BFF038d2FdeDCb65bcd54e049E4199103');
+              contract = new web3.eth.Contract(contractABI, '0xC7A11957639a2b6f1eFe422AF0C8D6a5AbC1B263');
               console.log("Contract initialized:", contract);
               getUserName();
           } else {
@@ -110,7 +105,7 @@ async function getUserName() {
 
 
   window.addEventListener('load', async () => {
-    await loadABI();
+    
     await initWeb3();
   });
 

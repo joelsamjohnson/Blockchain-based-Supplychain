@@ -35,29 +35,7 @@
 <div class="alert alert-success" role="alert" style="display:none;" id="successAlert">
   You have successfully registered!
 </div>
-<h5 class="card-title fw-semibold mb-4">Raw Material Suppliers</h5>
-<div class="table-responsive">
-  <table class="table text-nowrap mb-0 align-middle">
-    <thead class="text-dark fs-4">
-    <tr>
-      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">ID</h6></th>
-      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Name</h6></th>
-      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Place</h6></th>
-      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Ethereum Address</h6></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for rm in rms.values %}
-    <tr>
-      <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ rm.1 }}</h6></td>
-      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ rm.2 }}</p></td>
-      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ rm.3 }}</p></td>
-      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ rm.0 }}</p></td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
+
 <h5 class="card-title fw-semibold mb-4">Manufacturers</h5>
 <div class="table-responsive">
   <table class="table text-nowrap mb-0 align-middle">
@@ -133,8 +111,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/web3@1.3.0/dist/web3.min.js"></script>
 <script>
-  const contractABI = [
-    {
+  
+document.querySelector('.ethereumButton').addEventListener('click', function (e) {
+    e.preventDefault(); // Prevent form from submitting immediately
+
+    if (!window.ethereum) {
+      alert('MetaMask is not installed!');
+      return;
+    }
+   contractABI = [{
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
@@ -171,20 +156,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_productID",
-          "type": "uint256"
-        }
-      ],
-      "name": "Distribute",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -218,20 +191,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_productID",
-          "type": "uint256"
-        }
-      ],
-      "name": "Manufacturing",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -244,7 +205,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -273,7 +235,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "RMSid",
+          "name": "price",
           "type": "uint256"
         },
         {
@@ -298,7 +260,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -332,77 +295,84 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "disCtr",
+      "outputs": [
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
         }
       ],
-      "name": "RMS",
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "manCtr",
       "outputs": [
         {
-          "internalType": "address",
-          "name": "addr",
-          "type": "address"
-        },
-        {
           "internalType": "uint256",
-          "name": "id",
+          "name": "",
           "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "place",
-          "type": "string"
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "productCtr",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "retCtr",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_productID",
-          "type": "uint256"
-        }
-      ],
-      "name": "RMSsupply",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
         {
-          "internalType": "uint256",
-          "name": "_productID",
-          "type": "uint256"
-        }
-      ],
-      "name": "Retail",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
         {
-          "internalType": "uint256",
-          "name": "_productID",
-          "type": "uint256"
+          "internalType": "string",
+          "name": "_place",
+          "type": "string"
         }
       ],
-      "name": "Sold",
+      "name": "addManufacturer",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -448,56 +418,63 @@
           "type": "string"
         }
       ],
-      "name": "addManufacturer",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        },
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_place",
-          "type": "string"
-        }
-      ],
-      "name": "addRMS",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        },
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_place",
-          "type": "string"
-        }
-      ],
       "name": "addRetailer",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_productID",
+          "type": "uint256"
+        }
+      ],
+      "name": "Manufacturing",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_productID",
+          "type": "uint256"
+        }
+      ],
+      "name": "Distribute",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_productID",
+          "type": "uint256"
+        }
+      ],
+      "name": "Retail",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_productID",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchaseProduct",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -510,6 +487,11 @@
           "internalType": "string",
           "name": "_description",
           "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
         }
       ],
       "name": "addproduct",
@@ -518,69 +500,42 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "disCtr",
-      "outputs": [
+      "inputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "_productID",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_price",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
+      "name": "setProductPrice",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "manCtr",
-      "outputs": [
+      "inputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "_productID",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "productCtr",
+      "name": "isProductAvailableForPurchase",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bool",
           "name": "",
-          "type": "uint256"
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "retCtr",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "rmsCtr",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -599,19 +554,14 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ]
-  document.querySelector('.ethereumButton').addEventListener('click', function (e) {
-    e.preventDefault(); // Prevent form from submitting immediately
-
-    if (!window.ethereum) {
-      alert('MetaMask is not installed!');
-      return;
-    }
 
     const web3 = new Web3(window.ethereum);
-    const contractAddress = '0xFE8dd0108F2120998b31F236F1435D090C1f3d1c';
+    const contractAddress = '0xC7A11957639a2b6f1eFe422AF0C8D6a5AbC1B263';
+    
     const contract = new web3.eth.Contract(contractABI, contractAddress);
     const entityType = document.getElementById('id_entity_type').value;
     const address = document.getElementById('id_address').value;

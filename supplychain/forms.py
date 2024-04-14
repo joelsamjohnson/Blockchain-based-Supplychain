@@ -7,8 +7,7 @@ class AddEntityForm(forms.Form):
     ENTITY_CHOICES = [
         ('M', 'Manufacturer'),
         ('D', 'Distributor'),
-        ('R', 'Retailer'),
-        ('S', 'RMS'),
+        ('R', 'Retailer')
     ]
     entity_type = forms.ChoiceField(choices=ENTITY_CHOICES, label="Entity Type")
     address = forms.CharField(max_length=100)
@@ -17,7 +16,8 @@ class AddEntityForm(forms.Form):
 
 class AddProductForm(forms.Form):
     name = forms.CharField(max_length=100)
-    description = forms.CharField(max_length=500)   
+    description = forms.CharField(max_length=500)
+    price = forms.DecimalField(max_digits=10, decimal_places=2)
 
 
 class LoginForm(forms.Form):
