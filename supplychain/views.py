@@ -10,7 +10,7 @@ from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm
 
 
 web3 = get_web3_connection()
-contract_address = '0xC7A11957639a2b6f1eFe422AF0C8D6a5AbC1B263'
+contract_address = '0xF4C7779F69D9adb61fdd0A196D9CaeDC26396E47'
 abi_filename = 'myContractABI.json'
 project_directory = os.path.dirname(os.path.dirname(__file__))
 contracts_directory = os.path.join(project_directory, 'contracts')
