@@ -498,7 +498,7 @@
                 if (accounts.length > 0) {
                     const currentAccount = accounts[0];
                     document.getElementById('currentAccount').innerText = `Connected Account: ${currentAccount}`;
-                    contract = new web3.eth.Contract(contractABI, '0xc5E531A2cE8164f4A226C7F297436463C3c1a0ac');
+                    contract = new web3.eth.Contract(contractABI, '0xF4C7779F69D9adb61fdd0A196D9CaeDC26396E47');
                     console.log("Contract initialized:", contract);
                     getProductsHandled(currentAccount);
                 } else {
