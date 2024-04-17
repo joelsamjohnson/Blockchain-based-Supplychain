@@ -17,8 +17,8 @@ contracts_directory = os.path.join(project_directory, 'contracts')
 abi_path = os.path.join(contracts_directory, abi_filename)
 contract = get_contract_instance(web3, contract_address, abi_path)
 account_from = {
-            "private_key": "0x1daed4c35596cef9987e4e4bcf45c58d1952dbe7bb679506ead491dbbf2e579f",
-            "address": '0x3f46FE5766AA1D350512d75C4A67176611140391',
+            "private_key": "8385157bb56738af6c00963de326373848fa55cfbe7082117801f3e96dcaac25",
+            "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
         }
 
 
