@@ -1,47 +1,4 @@
-{% extends "base user.html" %}
-{% block heading %}Supply Chain Flow:{% endblock heading %}
-{% block content %}
-<p>Product Order -&gt; Manufacturer -&gt; Distributor -&gt; Retailer -&gt; Consumer</p>
-
-<div id="app">
-  <table class="table table-bordered">
-      <thead>
-      <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Name</th>
-          <th scope="col">Description</th>
-          <th scope="col">Current Stage</th>
-      </tr>
-      </thead>
-      <tbody id="prodTableBody">
-      <!-- Products will be added here -->
-      </tbody>
-  </table>
-  <div class="card">
-    <div class="card-body" style="text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px;">
-      <select class="form-select" id="typeSelect" style="width: auto; flex-grow: 1;" onchange="updateButtonText()">
-        <option value="Manufacturing">Manufacture</option>
-        <option value="Distribute">Distribute</option>
-        <option value="Retail">Retail</option>
-        <option value="Sold">Sold</option>
-      </select>
-      <input type="text" class="form-control" id="product_id" name="prod_id" placeholder="Enter Product ID" style="flex-grow: 2;">
-      <button onclick="flow()" class="btn btn-sm btn-primary" style="flex-grow: 1;" id="submitButton">Submit</button>
-    </div>
-  </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/web3@1.3.0/dist/web3.min.js"></script>
-<br />
-<div class="alert alert-success" role="alert" style="display:none;" id="successAlert">
-
-</div>
-<div class="alert alert-danger" role="alert" style="display:none;" id="errorAlert">
-  Transaction was not created
-</div>
-
-
-<script>
-  contractABI = [
+ contractABI =[
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -79,8 +36,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -114,8 +70,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -128,8 +83,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -183,8 +137,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -218,8 +171,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -232,8 +184,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -246,8 +197,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -260,8 +210,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -285,8 +234,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -299,8 +247,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -421,8 +368,7 @@
       "name": "purchaseProduct",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function",
-      "payable": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -435,8 +381,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -496,8 +441,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -516,8 +460,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -536,189 +479,70 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ]
-const contractAddress = '0xc5E531A2cE8164f4A226C7F297436463C3c1a0ac';
 
-let currentAccount = null;
-let contract;
-let web3;
 
-async function initWeb3() {
-  if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const accounts = await web3.eth.getAccounts();
-      if (accounts.length > 0) {
-        currentAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        await renderProgressChart();
-        await loadProducts(); // Make sure this function is defined and accessible
-      } else {
-        console.error("No accounts found.");
-      }
-    } catch (error) {
-      console.error("Initialization error:", error);
+    let contract;
+    const web3 = new Web3(window.ethereum);
+
+    async function connectWallet() {
+        if (window.ethereum) {
+            window.web3 = new Web3(window.ethereum);
+            console.log("Web3 initialized.");
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("Accounts requested.");
+                const accounts = await web3.eth.getAccounts();
+                if (accounts.length > 0) {
+                    const currentAccount = accounts[0];
+                    document.getElementById('currentAccount').innerText = `Connected Account: ${currentAccount}`;
+                    contract = new web3.eth.Contract(contractABI, '0xc5E531A2cE8164f4A226C7F297436463C3c1a0ac');
+                    console.log("Contract initialized:", contract);
+                    getProductsHandled(currentAccount);
+                } else {
+                    console.error("No accounts found.");
+                }
+            } catch (error) {
+                console.error("User denied account access", error);
+            }
+        } else {
+            console.error("Non-Ethereum browser detected. Consider trying MetaMask!");
+        }
     }
-  } else {
-    console.error("Please install MetaMask!");
-  }
-};
-
-async function renderProgressChart() {
-  const ctx = document.getElementById('productProgressChart').getContext('2d');
-  const productStages = await getProductStages();
-  const data = {
-      labels: productStages.map(p => p.name),
-      datasets: [{
-          label: 'Product Progress',
-          data: productStages.map(p => p.stage),
-          backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-          ],
-          borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-          ],
-          borderWidth: 1
-      }]
-  };
-
-  const config = {
-      type: 'bar',
-      data: data,
-      options: {
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      // Assuming your stages are integers from 0 (not started) to 5 (completed)
-                      stepSize: 1,
-                      callback: function (value, index, values) {
-                          // Customize this mapping based on your actual product stages
-                          const stages = ["Not started", "Ordered", "Manufacturing", "Distributed", "Retail", "Sold"];
-                          return stages[value];
-                      }
-                  }
-              }
-          }
-      }
-  };
-  new Chart(ctx, config);
-}
-
-window.flow = async () => {
-    try {
-      const productID = document.getElementById("product_id").value;
-      if (!productID) {
-        alert("Product ID is required");
-        return;
-      }
-      const selectValue = document.getElementById("typeSelect").value;
-      let tx;
-      switch (selectValue) {
-        case "Manufacturing":
-          tx = await contract.methods.Manufacturing(productID).send({ from: currentAccount });
-          break;
-        case "Distribute":
-          tx = await contract.methods.Distribute(productID).send({ from: currentAccount });
-          break;
-        case "Retail":
-          tx = await contract.methods.Retail(productID).send({ from: currentAccount });
-          break;
-        case "Sold":
-          tx = await contract.methods.Sold(productID).send({ from: currentAccount });
-          break;
-        default:
-          alert("Invalid selection");
-          return;
-      }
-      if (tx) {
-        const successMessage = `Successfully performed '${selectValue}' for Product ID ${productID}.`;
-        const successAlert = document.getElementById('successAlert');
-        successAlert.innerText = successMessage;
-        successAlert.style.display = 'block';
-      }
-    } catch (error) {
-      console.error("Error during transaction:", error);
-      const errorAlert = document.getElementById('errorAlert');
-      errorAlert.innerText = `Error: ${error.message}`;
-      errorAlert.style.display = 'block';
-    }
-  };
-async function loadProducts() {
-  if (!contract) {
-    console.error("Contract is not initialized.");
-    return;
-  }
-  const productsCount = await contract.methods.productCtr().call();
-  const tableBody = document.getElementById('prodTableBody'); // Get the tbody element where products will be added
-
-  for (let i = 1; i <= productsCount; i++) {
-      const product = await contract.methods.ProductStock(i).call();
-      const row = tableBody.insertRow(); // Insert a new row in the table
-
-      // Insert cells (`<td>`) and fill them with medicine data
-      const cellId = row.insertCell(0);
-      cellId.innerHTML = product.id;
-
-      const cellName = row.insertCell(1);
-      cellName.innerHTML = product.name;
-
-      const cellDescription = row.insertCell(2);
-      cellDescription.innerHTML = product.description;
-
-      const cellStage = row.insertCell(3);
-      const stageNames = [
-        "Product Ordered",
-        "Manufacturing Stage",
-        "Distribution Stage",
-        "Retailing Stage",
-        "Sold"
-      ];
-      cellStage.innerHTML = stageNames[product.stage];
-  }
-}
-async function main() {
-  await initWeb3();
- 
-}
-document.addEventListener('DOMContentLoaded', main);
-updateButtonText();
-function updateButtonText() {
-    const select = document.getElementById('typeSelect');
-    const button = document.getElementById('submitButton');
-    const selectedText = select.options[select.selectedIndex].text; // Get the text of the selected option
-    button.textContent = selectedText; // Update the button text
-}
-async function getProductStages() {
-    const productsCount = await contract.methods.productCtr().call();
-    let productStages = []; // Initialize an empty array to hold product stages
-
-    for (let i = 1; i <= productsCount; i++) {
-        const product = await contract.methods.ProductStock(i).call();
-
-        // Add an object with the product name and stage to the productStages array
-        productStages.push({
-            name: product.name,
-            stage: parseInt(product.stage) // Ensure stage is treated as an integer
-        });
-    }
-    return productStages;
-}
-</script>
-{% endblock content %}
 
 
-{% block something %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div class="chart-container" style="position: relative; height:40vh; width:80vw">
-    <canvas id="productProgressChart"></canvas>
-</div>
-{% endblock something %}
+    async function getProductsHandled(currentAccount) {
+        try {
+            const productIds = await contract.methods.getProductsByAddress(currentAccount).call();
+            const productsContainer = document.querySelector('.row');
+            productsContainer.innerHTML = '';
+
+            for (let id of productIds) {
+                const product = await contract.methods.ProductStock(id).call();
+
+                // Generate HTML for each product
+                const productHtml = `
+                     <div class="col-sm-6 col-xl-3">
+                        <div class="card overflow-hidden rounded-2">
+                        <div class="card-body pt-3 p-4">
+                            <h6 class="fw-semibold fs-4">${product.name}</h6>
+                            <h6 class="fw-semibold fs-4 mb-0">$${product.price}</h6>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                // Append the generated HTML to the container
+                productsContainer.innerHTML += productHtml;
+            }
+        } catch (error) {
+            alert("Address not matching a user");
+            if (error.data) {
+                console.error("Error data:", error.data);
+            }
+        }
+        }
+
+

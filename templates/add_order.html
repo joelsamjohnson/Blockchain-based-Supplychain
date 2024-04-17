@@ -48,7 +48,8 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.3.0/dist/web3.min.js"></script>
 
 <script>
-contractABI = [{
+contractABI = [
+    {
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
@@ -270,6 +271,31 @@ contractABI = [{
       "constant": true
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchases",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
       "inputs": [],
       "name": "retCtr",
       "outputs": [
@@ -406,6 +432,20 @@ contractABI = [{
       "payable": true
     },
     {
+      "inputs": [],
+      "name": "getMyPurchases",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
       "inputs": [
         {
           "internalType": "string",
@@ -485,6 +525,26 @@ contractABI = [{
       "stateMutability": "view",
       "type": "function",
       "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "getProductsByAddress",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
     }
   ]
 let contract;
@@ -503,10 +563,7 @@ let contract;
           const accounts = await web3.eth.getAccounts();
           console.log("Accounts retrieved:", accounts);
           if (accounts.length > 0) {
-              currentAccount = accounts[0];
-              console.log("Current Account:", currentAccount);
-              document.getElementById('currentAccount').innerText = `${currentAccount}`;
-              contract = new web3.eth.Contract(contractABI, '0xC7A11957639a2b6f1eFe422AF0C8D6a5AbC1B263');
+              contract = new web3.eth.Contract(contractABI, '0xc5E531A2cE8164f4A226C7F297436463C3c1a0ac');
               console.log("Contract initialized:", contract);
           } else {
               console.error("No accounts found.");
