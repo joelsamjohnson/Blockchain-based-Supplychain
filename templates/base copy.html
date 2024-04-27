@@ -21,7 +21,7 @@
     ================================================== -->
     <script src="{% static 'js/modernizr.js' %}"></script>
   </head>
-  <body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" tabindex="0">
+  <body class="body-wrapper" data-bs-spy="scroll" data-bs-target="#navbar" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" tabindex="0">
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
         <title>Search</title>
@@ -152,7 +152,7 @@
                 <li class="nav-item">
                   <a class="nav-link me-4 active" href="#billboard">Home</a>
                 </li>
-                <!-- <li class="nav-item">
+                <li class="nav-item">
                   <a class="nav-link me-4" href="#company-services">Services</a>
                 </li>
                 <li class="nav-item">
@@ -166,7 +166,7 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link me-4" href="#latest-blog">Blog</a>
-                </li> -->
+                </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link me-4 dropdown-toggle link-dark" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Pages</a>
                   <ul class="dropdown-menu">
@@ -207,7 +207,7 @@
                         </a>
                       </li>
                       <li class="pe-3">
-                        <a href="#">
+                        <a href="{% url 'customer_login' %}">
                           <svg class="user">
                             <use xlink:href="#user"></use>
                           </svg>
@@ -229,6 +229,8 @@
         </div>
       </nav>
     </header>
+    {% block register %}
+
     <section id="billboard" class="position-relative overflow-hidden bg-light-blue">
       <div class="swiper main-swiper">
         <div class="swiper-wrapper">
@@ -732,6 +734,7 @@
       </div>
     </section>
     {% endblock %}
+
     <section id="instagram" class="padding-large overflow-hidden no-padding-top">
       <div class="container">
         <div class="row">
@@ -793,6 +796,8 @@
         </div>
       </div>
     </section>
+  {% endblock %}
+
     <footer id="footer" class="overflow-hidden">
       <div class="container">
         <div class="row">

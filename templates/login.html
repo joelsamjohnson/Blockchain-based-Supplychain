@@ -29,7 +29,7 @@
                     <p>{{ msg }}</p>
                 </div>
                 {% endif %}
-                <form method="post" action="{% url 'login' %}" id="loginForm">
+                <form method="post" action="{% url 'supply_login' %}" id="loginForm">
                   {% csrf_token %}
                   <div class="mb-3">
                     <label for="id_email" class="form-label">Email</label>
@@ -50,7 +50,7 @@
                     <p class="fs-4 mb-0 fw-bold">New to Supplychain?</p>
                     <a class="text-primary fw-bold ms-2" href="{% url 'register_url' %}">Create an account</a>
                     <p class="fs-4 mb-0 fw-bold">Want to purchase products?</p>
-                    <a class="text-primary fw-bold ms-2" href="{% url 'ecommerce' %}">Go to E-Commerce Home Page</a>
+                    <a class="text-primary fw-bold ms-2" href="{% url 'customer_home' %}">Go to E-Commerce Home Page</a>
                     
                   </div>
                 </form>

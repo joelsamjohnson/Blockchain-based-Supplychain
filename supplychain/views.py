@@ -1,12 +1,15 @@
 import os
-
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .ethereum_utils import get_web3_connection, get_contract_instance, send_transaction
 from .models import User, Product, Register
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm
+from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm, CreateUserForm
 
 
 web3 = get_web3_connection()
@@ -183,7 +186,7 @@ def user_home_page(request):
     return render(request, 'user_home.html')
 
 
-def login(request):
+def supply_login(request):
     msg = None
 
     if request.method == 'POST':
@@ -226,5 +229,39 @@ def track_product(request):
 def manage(request):
     return render(request, 'view_orders.html')
 
-def ecommerce(request):
+@login_required(login_url='customer_login')
+def customer_home(request):
     return render(request, 'custom_home.html')
+
+def customer_register(request):
+    form = CreateUserForm()
+
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.cleaned_data.get('username')
+            messages.success(request, 'Account was created for ' + user)
+            return redirect('customer_login')
+    context = {'form':form}
+    return render(request, 'accounts/register.html', context)
+
+def customer_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('customer_home')
+        else:
+            messages.info(request, "Username or Password is incorrect")
+    context = {}
+    return render(request, 'accounts/login.html', context)
+
+def customer_logout(request):
+    print(f"Logging out {request.user.username}")
+    logout(request)
+    return redirect('customer_login')
