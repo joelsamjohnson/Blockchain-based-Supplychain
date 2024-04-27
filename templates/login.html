@@ -24,6 +24,11 @@
                   <img src="{% static 'images/logos/website.webp' %}" width="180" alt="">
                 </a>
                 <p class="text-center">Know your order's every move</p>
+                {% if msg %}
+                <div class="alert alert-danger">
+                    <p>{{ msg }}</p>
+                </div>
+                {% endif %}
                 <form method="post" action="{% url 'login' %}" id="loginForm">
                   {% csrf_token %}
                   <div class="mb-3">
@@ -44,6 +49,9 @@
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">New to Supplychain?</p>
                     <a class="text-primary fw-bold ms-2" href="{% url 'register_url' %}">Create an account</a>
+                    <p class="fs-4 mb-0 fw-bold">Want to purchase products?</p>
+                    <a class="text-primary fw-bold ms-2" href="{% url 'ecommerce' %}">Go to E-Commerce Home Page</a>
+                    
                   </div>
                 </form>
               </div>

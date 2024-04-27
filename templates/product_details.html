@@ -12,6 +12,7 @@
                 <!-- Product Details -->
                 <h6 class="fw-semibold" id="productName">Product Name</h6>
                 <p id="productDescription">Product Description</p>
+                <p id="productPrice">Product Price</p>
                 <!-- Manufacturer Details -->
                 Manufacturer
                 <p id="manufacturerDetails">Manufacturer: Loading...</p>
@@ -484,7 +485,6 @@
 
 	let contract;
     let web3;
-    const contractAddress = '0xF4C7779F69D9adb61fdd0A196D9CaeDC26396E47';
 
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
@@ -497,7 +497,7 @@
             try {
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 console.log("Web3 initialized and accounts requested.");
-                contract = new web3.eth.Contract(contractABI, contractAddress);
+                contract = new web3.eth.Contract(contractABI, '0x65cf33Ef7b25d4365FeEcBd292c359E833d9b4DB');
                 console.log("Contract initialized with web3.js");
             } catch (error) {
                 console.error("Could not get accounts", error);
@@ -512,9 +512,9 @@
         fetch(`/show-product-details/${productID}/`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('productName').textContent = data.product_name;
-            document.getElementById('productDescription').textContent = data.product_description;
-            document.getElementById('productPrice').textContent = data.product_price;
+            document.getElementById('productName').innerHTML = `Name: ${data.product_name}`;
+            document.getElementById('productDescription').innerHTML = `Description: ${data.product_description}`;
+            document.getElementById('productPrice').innerHTML = `Price: ${data.product_price} wei`;
 
 
             // Using innerHTML for line breaks, ensure data is sanitized to avoid XSS
@@ -548,112 +548,6 @@
 
 {% endblock content %}
 
-<div class="row">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card overflow-hidden rounded-2">
-            <div class="position-relative">
-                <a href="javascript:void(0)"><img src="../assets/images/products/s4.jpg" class="card-img-top rounded-0"
-                        alt="..."></a>
-                <a href="javascript:void(0)"
-                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
-                        class="ti ti-basket fs-4"></i></a>
-            </div>
-            <div class="card-body pt-3 p-4">
-                <h6 class="fw-semibold fs-4">Boat Headphone</h6>
-                <div class="d-flex align-items-center justify-content-between">
-                    <h6 class="fw-semibold fs-4 mb-0">$50 <span
-                            class="ms-2 fw-normal text-muted fs-3"><del>$65</del></span></h6>
-                    <ul class="list-unstyled d-flex align-items-center mb-0">
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card overflow-hidden rounded-2">
-            <div class="position-relative">
-                <a href="javascript:void(0)"><img src="../assets/images/products/s5.jpg" class="card-img-top rounded-0"
-                        alt="..."></a>
-                <a href="javascript:void(0)"
-                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
-                        class="ti ti-basket fs-4"></i></a>
-            </div>
-            <div class="card-body pt-3 p-4">
-                <h6 class="fw-semibold fs-4">MacBook Air Pro</h6>
-                <div class="d-flex align-items-center justify-content-between">
-                    <h6 class="fw-semibold fs-4 mb-0">$650 <span
-                            class="ms-2 fw-normal text-muted fs-3"><del>$900</del></span></h6>
-                    <ul class="list-unstyled d-flex align-items-center mb-0">
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card overflow-hidden rounded-2">
-            <div class="position-relative">
-                <a href="javascript:void(0)"><img src="../assets/images/products/s7.jpg" class="card-img-top rounded-0"
-                        alt="..."></a>
-                <a href="javascript:void(0)"
-                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
-                        class="ti ti-basket fs-4"></i></a>
-            </div>
-            <div class="card-body pt-3 p-4">
-                <h6 class="fw-semibold fs-4">Red Valvet Dress</h6>
-                <div class="d-flex align-items-center justify-content-between">
-                    <h6 class="fw-semibold fs-4 mb-0">$150 <span
-                            class="ms-2 fw-normal text-muted fs-3"><del>$200</del></span></h6>
-                    <ul class="list-unstyled d-flex align-items-center mb-0">
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card overflow-hidden rounded-2">
-            <div class="position-relative">
-                <a href="javascript:void(0)"><img src="../assets/images/products/s11.jpg" class="card-img-top rounded-0"
-                        alt="..."></a>
-                <a href="javascript:void(0)"
-                    class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i
-                        class="ti ti-basket fs-4"></i></a>
-            </div>
-            <div class="card-body pt-3 p-4">
-                <h6 class="fw-semibold fs-4">Cute Soft Teddybear</h6>
-                <div class="d-flex align-items-center justify-content-between">
-                    <h6 class="fw-semibold fs-4 mb-0">$285 <span
-                            class="ms-2 fw-normal text-muted fs-3"><del>$345</del></span></h6>
-                    <ul class="list-unstyled d-flex align-items-center mb-0">
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                        <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="py-6 px-6 text-center">
     <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank"
             class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a

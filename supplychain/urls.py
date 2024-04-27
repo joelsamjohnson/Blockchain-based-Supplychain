@@ -13,11 +13,5 @@ urlpatterns = [
     path('supply/', supply, name='supply'),
     path('manage/', manage, name='manage'),
     path('track/', track_product, name='track'),
-    path('viewchat/',viewchat,name='view_chat'),
-    path('chatuser/',chatuser,name='chatuser'),
-    path('chatadmin/<int:user_id>',chatadmin,name='chatadmin'),
-    path('addchat_user/',addchat_user,name='addchat_user'),
-    path('user-search', user_search,name='user_search'),
-    path('chatadmin/addchat_admin',addchat_admin,name='addchat_admin'),
-
+    path('customer-home', ecommerce, name='ecommerce')
 ]

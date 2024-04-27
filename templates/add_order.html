@@ -563,7 +563,10 @@ let contract;
           const accounts = await web3.eth.getAccounts();
           console.log("Accounts retrieved:", accounts);
           if (accounts.length > 0) {
-              contract = new web3.eth.Contract(contractABI, '0xF4C7779F69D9adb61fdd0A196D9CaeDC26396E47');
+              currentAccount = accounts[0];
+              console.log("Current Account:", currentAccount);
+              document.getElementById('currentAccount').innerText = `${currentAccount}`;
+              contract = new web3.eth.Contract(contractABI, '0x65cf33Ef7b25d4365FeEcBd292c359E833d9b4DB');
               console.log("Contract initialized:", contract);
           } else {
               console.error("No accounts found.");

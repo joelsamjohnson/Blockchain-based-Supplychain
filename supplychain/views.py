@@ -3,14 +3,14 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .ethereum_utils import get_web3_connection, get_contract_instance, send_transaction
-from .models import User, Product, Chat, Register
+from .models import User, Product, Register
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm
 
 
 web3 = get_web3_connection()
-contract_address = '0xF4C7779F69D9adb61fdd0A196D9CaeDC26396E47'
+contract_address = '0x65cf33Ef7b25d4365FeEcBd292c359E833d9b4DB'
 abi_filename = 'myContractABI.json'
 project_directory = os.path.dirname(os.path.dirname(__file__))
 contracts_directory = os.path.join(project_directory, 'contracts')
@@ -184,6 +184,8 @@ def user_home_page(request):
 
 
 def login(request):
+    msg = None
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -203,13 +205,15 @@ def login(request):
                     return redirect('user_home')  # Redirect to a success page.
                 else:
                     msg = "Username or Password is incorrect."
-                    return render(request, 'error.html', {'msg': msg})
+                    
             except Register.DoesNotExist:
                 msg = "Username does not exist."
-                return render(request, 'error.html', {'msg': msg})
+        else:
+            msg = "Please correct the errors below."
     else:
         form = LoginForm()
-        return render(request, 'login.html', {'form': form})
+    
+    return render(request, 'login.html', {'form': form, 'msg':msg})
 
 
 
@@ -222,100 +226,5 @@ def track_product(request):
 def manage(request):
     return render(request, 'view_orders.html')
 
-def chatuser(request):
-    try:
-        # Assuming the admin has a specific user_id or a distinguishing attribute
-        # Replace `admin_id` with the actual admin identification logic
-        admin_user = User.objects.get(email='admin@gmail.com') # Example: identifying admin by email
-        current_user = User.objects.get(pk=request.session.get('_auth_user_id'))
-
-        # Fetch messages where the current user is the sender or receiver, involving the admin
-        chats = Chat.objects.filter(sender=current_user, receiver=admin_user) | Chat.objects.filter(sender=admin_user, receiver=current_user)
-        chats = chats.order_by('timestamp')  # Ensure messages are in chronological order
-
-    except User.DoesNotExist:
-        return redirect('login')  # Redirect to login if user not found
-
-    return render(request, 'chat_user.html', {'chats': chats, 'admin_user': admin_user, 'current_user': current_user})
-
-
-def addchat_user(request):
-    if request.method == 'POST':
-        try:
-            admin_user = User.objects.get(email='admin@gmail.com') # Example: identifying admin by email
-            current_user = User.objects.get(pk=request.session.get('_auth_user_id'))
-
-            message = request.POST.get('message')
-
-            # Create and save the new chat instance
-            Chat.objects.create(sender=current_user, receiver=admin_user, message=message)
-        except User.DoesNotExist:
-            # Redirect to login if either user not found
-            return redirect('login')
-
-    return redirect(reverse('chatuser'))
-
-
-def user_search(request):
-    query = request.GET.get('query', '')
-    if query:
-        users = Register.objects.filter(name__icontains=query)
-    else:
-        users = Register.objects.none()
-    
-    return render(request, 'chat.html', {'users': users})
-
-
-def viewchat(request):
-    user_id = request.session.get('_auth_user_id', None)
-    if request.session.get('user_id') == 11:
-        users = Register.objects.exclude(email="admin@gmail.com")
-        print(users)
-        return render(request, 'chat.html', {'users': users})
-    elif user_id:
-        try:
-            current_user = Register.objects.get(pk=user_id)
-            # Assuming we want to show admin in the list for regular users
-            users = Register.objects.filter(email='admin@gmail.com')
-            # Optionally, show other users too for product requests, excluding the current user
-            # users = Register.objects.exclude(pk=user_id)
-            return render(request, 'chat.html', {'users': users})
-        except Register.DoesNotExist:
-            # User not found, maybe logout or handle appropriately
-            return redirect('login')
-    else:
-        # No user is logged in
-        return redirect('login')
-
-# def viewchatuser(request, user_id):
-#     # Handling chat between the current user and the selected user
-#     chats = Chat.objects.filter(sender=request.user, receiver_id=user_id) | Chat.objects.filter(sender_id=user_id, receiver=request.user)
-#     chats = chats.order_by('timestamp')
-#     receiver = User.objects.get(id=user_id)
-#     return render(request, 'chat_user.html', {'chats': chats, 'receiver': receiver})
-
-
-def chatadmin(request, user_id):
-    user = Register.objects.get(id=user_id)
-    chats = Chat.objects.filter(sender=user) | Chat.objects.filter(receiver=user)
-    chats = chats.order_by('timestamp')  # Ensure messages are ordered by time
-    
-    return render(request, 'chatpage_admin.html', {
-        'chats': chats,
-        'username': user.name,
-        'user_id': user_id
-    })
-    
-
-def addchat_admin(request):
-    if request.method == 'POST':
-
-        user_id = request.POST.get('user_id') 
-        message = request.POST.get('message')
-        admin_user = Register.objects.first() 
-        user = Register.objects.get(id=user_id)
-        Chat.objects.create(sender=admin_user, receiver=user, message=message)
-        
-        return redirect(reverse('chatadmin', user_id=user_id))
-    
-    return redirect(reverse('chatadmin'))
+def ecommerce(request):
+    return render(request, 'custom_home.html')

@@ -4,8 +4,8 @@ import json
 import os
 
 def get_web3_connection():
-    web3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545')) # Connect to Ethereum node
-    if not web3.is_connected():
+    web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/NMyx4V3vwR1CGINsvgP-X1JtDNJIQmX6')) # Connect to Ethereum node
+    if not web3.isConnected():
             raise Exception("Failed to connect to Ethereum network.")
     return web3
 

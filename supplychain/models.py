@@ -26,15 +26,3 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-
-class Chat(models.Model):
-    sender = models.ForeignKey(Register, related_name='sent_messages', on_delete=models.CASCADE)
-    receiver = models.ForeignKey(Register, related_name='received_messages', on_delete=models.CASCADE)
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ('timestamp',)
-
-    def __str__(self):
-        return f"{self.sender} to {self.receiver} at {self.timestamp}"
