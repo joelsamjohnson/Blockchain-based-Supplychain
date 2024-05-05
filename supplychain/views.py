@@ -12,12 +12,10 @@ from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm, Creat
 
 
 web3 = get_web3_connection()
-contract_address = '0x65cf33Ef7b25d4365FeEcBd292c359E833d9b4DB'
-abi_filename = 'myContractABI.json'
+
 project_directory = os.path.dirname(os.path.dirname(__file__))
 contracts_directory = os.path.join(project_directory, 'contracts')
-abi_path = os.path.join(contracts_directory, abi_filename)
-contract = get_contract_instance(web3, contract_address, abi_path)
+
 account_from = {
             "private_key": "8385157bb56738af6c00963de326373848fa55cfbe7082117801f3e96dcaac25",
             "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
@@ -183,7 +181,7 @@ def register(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             Register.objects.create(email=email,password=password)
-        return redirect('login')
+        return redirect('supply_login')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form':form})
