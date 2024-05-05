@@ -48,42 +48,55 @@ def pin_image_to_ipfs(image_file):
     files = {'file': (image_file.name, image_file, 'multipart/form-data')}
     response = requests.post(url, files=files, headers=headers)
     ipfs_hash = response.json().get('IpfsHash')
+    print("IPFS Hash:", ipfs_hash)
     return ipfs_hash
 
 def add_product_to_blockchain(name, description, price, ipfs_hash):
     try:
-        function_name = 'addproduct'
-        args = [name, description, price, ipfs_hash]
+        if None in [name, description, price, ipfs_hash]:
+            raise ValueError("One of the parameters is None, which is not expected")
+        function_name = 'addProduct'
+        price_int = int(price)
+        args = [name, description, price_int, ipfs_hash]
         # Ensure that `send_transaction` is capable of handling the connection and sending data to the blockchain
         tx_hash = send_transaction(web3, productcontract, function_name, args, account_from['address'], account_from['private_key'])
         return {'success': True, 'transaction_hash': tx_hash}
     except Exception as e:
         return {'success': False, 'error': str(e)}
 
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET", "POST"])
 def add_product(request):
+    # Handle the form initialization and rendering for GET requests
+    if request.method == "GET":
+        form = AddProductForm()
+        return render(request, 'add_order.html', {'form': form})
+
+    # Process form submissions via POST
     if request.method == "POST":
-        form = AddProductForm(request.POST)
+        form = AddProductForm(request.POST, request.FILES)
         if form.is_valid():
             _name = form.cleaned_data['name']
             _description = form.cleaned_data['description']
-            _price = form.cleaned_data['price']
+            _price = int(form.cleaned_data['price'])
             _image = request.FILES['image']
-            ipfs_hash = pin_image_to_ipfs(_image)
+
+            ipfs_hash = pin_image_to_ipfs(_image)  # Function to handle IPFS
             Product.objects.create(name=_name, description=_description, price=_price)
 
-            # Call blockchain function
+            # Example function call to add a product to the blockchain
             result = add_product_to_blockchain(_name, _description, _price, ipfs_hash)
-            if result['success']:
-                print(result)
-                return redirect('success_url')  # Make sure 'success_url' is defined in your urls.py
+            if result.get('success'):
+                return JsonResponse({'success': True, 'message': 'Product added successfully!'})
             else:
-                # Handle the error, maybe show a message to the user
-                pass
-    else:
-        form = AddProductForm()
+                return JsonResponse({'success': False, 'error': result.get('error', 'Unknown error occurred')})
 
-    return render(request, 'add_order.html', {'form': form})
-
+        # If the form is not valid, you might want to send back errors
+        return JsonResponse({'success': False, 'error': form.errors}, status=400)
+        
 def product_details_initial(request):
     # This view just renders the template initially without product details.
     # Actual product details are fetched via AJAX using the `show_product_stage` view.
