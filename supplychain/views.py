@@ -29,14 +29,10 @@ account_from = {
             "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
         }
 # Product Contract Setup
-productcontract_address = '0xE17b12feDa856174ddB941915ca5B817A9706017'
-productabi_filename = 'ProductManagementABI.json'
-productcontract = get_contract_instance(web3, productcontract_address, productabi_filename)
+contract_address = '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7'
+abi_filename = 'TransactionManagementABI.json'
+contract = get_contract_instance(web3, contract_address, abi_filename)
 
-# Role Contract Setup
-rolecontract_address = '0x315FF1B4Fa64F0aC9eD6aEc30Aa11886E8d92Aeb'
-roleabi_filename = 'RoleManagementABI.json'
-rolecontract = get_contract_instance(web3, rolecontract_address, roleabi_filename)
 
 def pin_image_to_ipfs(image_file):
     url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
@@ -51,7 +47,7 @@ def add_product_to_blockchain(name, description, price, ipfs_hash):
         function_name = 'addproduct'
         args = [name, description, price, ipfs_hash]
         # Ensure that `send_transaction` is capable of handling the connection and sending data to the blockchain
-        tx_hash = send_transaction(web3, productcontract, function_name, args, account_from['address'], account_from['private_key'])
+        tx_hash = send_transaction(web3, contract, function_name, args, account_from['address'], account_from['private_key'])
         return {'success': True, 'transaction_hash': tx_hash}
     except Exception as e:
         return {'success': False, 'error': str(e)}
@@ -86,7 +82,7 @@ def product_details_initial(request):
 @require_http_methods(["GET"])
 def show_product_details(request, product_id):
     try:
-        product = productcontract.functions.ProductStock(product_id).call()
+        product = contract.functions.ProductStock(product_id).call()
         stage_descriptions = {
             0: "Product Ordered",
             1: "Manufacturing Stage",
@@ -109,11 +105,11 @@ def show_product_details(request, product_id):
             if user_id == 0:
                 return "Empty", "Empty"  
             elif user_type == 'MAN':
-                userdetails = rolecontract.functions.MAN(user_id).call()
+                userdetails = contract.functions.MAN(user_id).call()
             elif user_type == 'DIS':
-                userdetails = rolecontract.functions.DIS(user_id).call()
+                userdetails = contract.functions.DIS(user_id).call()
             elif user_type == 'RET':
-                userdetails = rolecontract.functions.RET(user_id).call()
+                userdetails = contract.functions.RET(user_id).call()
             else:
                 return "Invalid Type", "Invalid Type"
             return userdetails[2], userdetails[3] 
@@ -143,21 +139,21 @@ def add_entity(request):
     else:
         form = AddEntityForm()
         man = {}
-        man_ctr = rolecontract.functions.manCtr().call()
+        man_ctr = contract.functions.manCtr().call()
         for i in range(man_ctr):
-            man[i] = rolecontract.functions.MAN(i + 1).call()
+            man[i] = contract.functions.MAN(i + 1).call()
             print(man[i])
 
         dis = {}
-        dis_ctr = rolecontract.functions.disCtr().call()
+        dis_ctr = contract.functions.disCtr().call()
         for i in range(dis_ctr):
-            dis[i] = rolecontract.functions.DIS(i + 1).call()
+            dis[i] = contract.functions.DIS(i + 1).call()
             print(dis[i])
 
         ret = {}
-        ret_ctr = rolecontract.functions.retCtr().call()
+        ret_ctr = contract.functions.retCtr().call()
         for i in range(ret_ctr):
-            ret[i] = rolecontract.functions.RET(i + 1).call()
+            ret[i] = contract.functions.RET(i + 1).call()
             print(ret[i])
 
         return render(request, 'register_user.html', {
