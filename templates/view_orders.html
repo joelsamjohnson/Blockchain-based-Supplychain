@@ -521,7 +521,7 @@
                 const accounts = await web3.eth.getAccounts();
                 if (accounts.length > 0) {
                     const currentAccount = accounts[0];
-                    contract = new web3.eth.Contract(contractABI, '0x65cf33Ef7b25d4365FeEcBd292c359E833d9b4DB');
+                    contract = new web3.eth.Contract(contractABI, '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7');
                     console.log("Contract initialized:", contract);
                     getProductsHandled(currentAccount);
                 } else {

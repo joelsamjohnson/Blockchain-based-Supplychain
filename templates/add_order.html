@@ -402,7 +402,7 @@ async function initWeb3() {
 				currentAccount = accounts[0];
 				console.log("Current Account:", currentAccount);
 				document.getElementById('currentAccount').innerText = `${currentAccount}`;
-				contract = new web3.eth.Contract(contractABI, '0xE17b12feDa856174ddB941915ca5B817A9706017');
+				contract = new web3.eth.Contract(contractABI, '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7');
 				console.log("Contract initialized:", contract);
 			} else {
 				console.error("No accounts found.");

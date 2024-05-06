@@ -117,11 +117,6 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
     }
    contractABI = [
 	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -159,6 +154,19 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Distribute",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
@@ -190,6 +198,19 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Manufacturing",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "Owner",
 		"outputs": [
@@ -197,6 +218,65 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductStock",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "imageHash",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "MANid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "DISid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "RETid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum ProductManagement.STAGE",
+				"name": "stage",
+				"type": "uint8"
 			}
 		],
 		"stateMutability": "view",
@@ -234,6 +314,19 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Retail",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -278,6 +371,34 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 			}
 		],
 		"name": "addManufacturer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_imageHash",
+				"type": "string"
+			}
+		],
+		"name": "addProduct",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -333,6 +454,32 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 	},
 	{
 		"inputs": [],
+		"name": "productCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseProduct",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "retCtr",
 		"outputs": [
 			{
@@ -345,9 +492,8 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 		"type": "function"
 	}
 ]
-
-    const web3 = new Web3(window.ethereum);
-    const contractAddress = '0x315FF1B4Fa64F0aC9eD6aEc30Aa11886E8d92Aeb';
+   const web3 = new Web3(window.ethereum);
+    const contractAddress = '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7';
     
     const contract = new web3.eth.Contract(contractABI, contractAddress);
     const entityType = document.getElementById('id_entity_type').value;
