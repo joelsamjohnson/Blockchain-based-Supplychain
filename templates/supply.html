@@ -52,11 +52,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initContracts();
     updateButtonText();
 });
-
 async function initContracts() {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
         try {
+            await window.ethereum.enable();  // Request access
+            const accounts = await web3.eth.getAccounts();
+            if (accounts.length === 0) {
+                console.error("No access to accounts.");
+                return;
+            }
+            web3.eth.defaultAccount = accounts[0];  // Set default account
+
             const productABI = await (await fetch('/static/contracts/ProductManagementABI.json')).json();
             productManagementContract = new web3.eth.Contract(productABI, productManagementAddress);
             
@@ -72,6 +79,7 @@ async function initContracts() {
         console.error("Ethereum object not found. Make sure you have a web3 provider.");
     }
 }
+
 
 async function loadProducts() {
     if (!productManagementContract) {
@@ -104,7 +112,12 @@ async function performAction() {
         return;
     }
     try {
-        const tx = await transactionManagementContract.methods[action](productID).send({ from: web3.eth.defaultAccount });
+        const accounts = await web3.eth.getAccounts();
+        if (accounts.length === 0) {
+            displayAlert('errorAlert', 'No Ethereum accounts are available.');
+            return;
+        }
+        const tx = await transactionManagementContract.methods[action](productID).send({ from: accounts[0] });
         displayAlert('successAlert', `Successfully performed '${action}' for Product ID ${productID}.`);
     } catch (error) {
         console.error("Error during transaction:", error);
