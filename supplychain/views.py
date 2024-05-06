@@ -8,6 +8,7 @@ from .ethereum_utils import get_web3_connection, get_contract_instance, send_tra
 from .models import User, Product, Register
 from django.shortcuts import render, redirect
 from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm, CreateUserForm
+from web3 import Web3
 
 
 web3 = get_web3_connection()
@@ -22,14 +23,14 @@ def get_contract_instance(web3, contract_address, abi_filename):
     except FileNotFoundError:
         raise FileNotFoundError(f"ABI file not found at {abi_path}")
     
-    return web3.eth.contract(address=contract_address, abi=contract_abi)
+    return web3.eth.contract(address=Web3.to_checksum_address(contract_address), abi=contract_abi)
 
 account_from = {
-            "private_key": "8385157bb56738af6c00963de326373848fa55cfbe7082117801f3e96dcaac25",
+            "private_key": "0x03A32745d16f0dA8Bbbb05479BF20E5b26f9dCfF",
             "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
         }
 # Product Contract Setup
-contract_address = '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7'
+contract_address = '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6'
 abi_filename = 'TransactionManagementABI.json'
 contract = get_contract_instance(web3, contract_address, abi_filename)
 

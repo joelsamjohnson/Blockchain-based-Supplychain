@@ -4,7 +4,7 @@ import json
 import os
 
 def get_web3_connection():
-    web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/NMyx4V3vwR1CGINsvgP-X1JtDNJIQmX6')) # Connect to Ethereum node
+    web3 = Web3(Web3.HTTPProvider('http://127.0.0.1:9545/')) # Connect to Ethereum node
     if not web3.is_connected():
             raise Exception("Failed to connect to Ethereum network.")
     return web3
@@ -20,8 +20,13 @@ def load_contract_abi(abi_filename):
         raise FileNotFoundError(f"Unable to find the ABI file at {abi_path}")
 
 def get_contract_instance(web3, contract_address, abi_filename):
-    contract_abi = load_contract_abi(abi_filename)
-    return web3.eth.contract(address=contract_address, abi=contract_abi)
+    # Ensure address is in checksum format
+    checksum_address = Web3.to_checksum_address(contract_address)
+    # Load the ABI
+    with open(abi_filename, 'r') as file:
+        contract_abi = json.load(file)
+    # Create the contract instance
+    return web3.eth.contract(address=checksum_address, abi=contract_abi)
 
 def send_transaction(web3, contract, function_name, args, sender_address, sender_private_key):
     account_balance = web3.eth.get_balance(sender_address)

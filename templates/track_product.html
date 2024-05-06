@@ -61,6 +61,19 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Distribute",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
@@ -89,6 +102,19 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Manufacturing",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -195,6 +221,19 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "Retail",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -334,6 +373,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productID",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseProduct",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "retCtr",
 		"outputs": [
@@ -365,7 +417,7 @@
                 if (accounts.length > 0) {
                     currentAccount = accounts[0];
                     console.log("Current Account:", currentAccount);
-                    contract = new web3.eth.Contract(contractABI, '0xaf3f88ec99702f601a8ce5cb8c36253d76b2cac7');
+                    contract = new web3.eth.Contract(contractABI, '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6');
                     console.log("Contract initialized:", contract);
                 } else {
                     console.error("No accounts found.");
