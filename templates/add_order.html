@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="card">
 		<div class="card-body">
-			<form id="productForm" method="post" enctype="multipart/form-data" class="product-form">
+			<form id="addProductForm" method="post" action="{% url 'add_product' %}" enctype="multipart/form-data" class="product-form">
 				{% csrf_token %}
 				<div class="mb-3">
 					<label for="currentAccount" class="form-label"><b>Current Account Address:</b></label>
@@ -414,35 +414,26 @@ async function initWeb3() {
 		console.error("Ethereum object not found. Make sure you have a web3 provider.");
 	}
 }
-
-document.getElementById('productForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-	const csrftoken = formData.get('csrfmiddlewaretoken');
-    fetch("{% url 'add_product' %}", {
-    method: 'POST',
-    body: formData,
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  }).then(response => response.json())
+document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+    e.preventDefault();  // Prevent normal form submission
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    fetch(form.action, {  // Use form.action if your form's action attribute is set to the Django URL
+        method: 'POST',
+        body: formData,
+        headers: {
+            "X-CSRFToken": formData.get('csrfmiddlewaretoken'),  // Assuming CSRF token is part of the form
+        },
+    }).then(response => response.json())  // Convert the response to JSON
     .then(data => {
-      if (data.success) {
-        const successAlert = document.getElementById('successAlert');
-        successAlert.innerText = data.message;
-        successAlert.style.display = 'block';
-        setTimeout(() => successAlert.style.display = 'none', 5000); // Hide after 5 seconds
-      } else {
-        const errorAlert = document.getElementById('errorAlert');
-        errorAlert.innerText = data.error;
-        errorAlert.style.display = 'block';
-        setTimeout(() => errorAlert.style.display = 'none', 5000); // Hide after 5 seconds
-      }
+        if (data.success) {
+            alert('Success: ' + data.message);  // Show success message
+        } else {
+            alert('Error: ' + data.error);  // Show error message
+        }
     }).catch(error => {
-      const errorAlert = document.getElementById('errorAlert');
-      errorAlert.innerText = 'Network error or server is unreachable.';
-      errorAlert.style.display = 'block';
-      setTimeout(() => errorAlert.style.display = 'none', 5000); // Hide after 5 seconds
+        alert('Network error or server is unreachable: ' + error.message);  // Handle network errors
     });
 });
 
@@ -475,7 +466,7 @@ async function loadProducts() {
             "Retailing",
             "Sold"
         ];
-        cellStage.innerHTML = stageNames[product.stage]; 
+        cellStage.innerHTML = stageNames[product.stage];
     }
 }
 
