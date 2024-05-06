@@ -19,8 +19,6 @@ def load_contract_abi(abi_filename):
     except FileNotFoundError:
         raise FileNotFoundError(f"Unable to find the ABI file at {abi_path}")
 
-
-
 def get_contract_instance(web3, contract_address, abi_filename):
     contract_abi = load_contract_abi(abi_filename)
     return web3.eth.contract(address=contract_address, abi=contract_abi)
