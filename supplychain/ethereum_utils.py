@@ -5,14 +5,21 @@ import os
 
 def get_web3_connection():
     web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/NMyx4V3vwR1CGINsvgP-X1JtDNJIQmX6')) # Connect to Ethereum node
-    if not web3.isConnected():
+    if not web3.is_connected():
             raise Exception("Failed to connect to Ethereum network.")
     return web3
 
 def load_contract_abi(abi_filename):
-    abi_path = os.path.join(os.path.dirname(__file__), abi_filename)
-    with open(abi_path) as abi_file:
-        return json.load(abi_file)
+    # Construct the path from the ethereum_utils.py file to the ABI file in the static directory
+    abi_path = os.path.join(os.path.dirname(__file__), '..', '..', 'static', 'contracts', abi_filename)
+    print("Loading ABI from:", abi_path)  # This will show you the constructed path
+    try:
+        with open(abi_path) as abi_file:
+            return json.load(abi_file)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Unable to find the ABI file at {abi_path}")
+
+
 
 def get_contract_instance(web3, contract_address, abi_filename):
     contract_abi = load_contract_abi(abi_filename)

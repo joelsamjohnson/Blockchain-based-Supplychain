@@ -1,39 +1,66 @@
 {% extends 'base.html' %}
-{% block heading %}View Product Details{% endblock heading %}
+{% load static %}
+{% block heading %}View Product Details{% endblock %}
 
 {% block content %}
+<style>
+  .product-image-container {
+    width: 30%; /* Adjust this value as needed */
+    margin: auto; /* This centers the container horizontally */
+  }
+  .product-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px; /* Adjust max height as needed */
+  }
+</style>
 <div class="row">
-    <div class="col">
-        <div class="card overflow-hidden rounded-2">
-            <div class="card-body" id="productDetails">
-                <!-- Product Details -->
-                <h6 class="fw-semibold" id="productName">Product Name</h6>
-                <p id="productDescription">Product Description</p>
-                <p id="productPrice">Product Price</p>
-                <!-- Manufacturer Details -->
-                Manufacturer
-                <p id="manufacturerDetails">Manufacturer: Loading...</p>
-                <!-- Distributor Details -->
-                Distributor
-                <p id="distributorDetails">Distributor: Loading...</p>
-                <!-- Retailer Details -->
-                Retailer
-                <p id="retailerDetails">Retailer: Loading...</p>
-                <!-- Processing Stage -->
-                <b id="processingStage">Current Processing Stage: Loading...</b>
-            </div>
+  <!-- Column for product image and details -->
+  <div class="col-md-12">
+      <div class="card overflow-hidden rounded-2">
+        <div class="product-image-container">
+          <img id="productImage" src="{% static 'images/product-placeholder2.jpg' %}" alt="Product Image" class="card-img-top img-fluid product-image">
         </div>
-        <div>
-            <div>
-                <form action="{% url 'show_product_details' product_id=0 %}" method="GET" id="productIDForm">
-                    <label for="productIDInput">Enter Product ID:</label>
-                    <input type="number" class="form-control" id="productIDInput" name="productID" required><br>
-                    <button type="submit" class="btn btn-primary" id="viewProductButton">View Product</button>
-                </form>
-            </div>
-        </div>
-    </div>
+        <div class="card-body" id="productDetails">
+          <div class="row">
+              <!-- Left column for product details -->
+              <div class="col-md-6">
+                  <h6 class="fw-semibold" id="productName">Awaiting Product Name...</h6>
+                  <p id="productDescription">Retrieving description...</p>
+                  <p id="productPrice">Fetching price information...</p>
+              </div>
+      
+              <!-- Right column for manufacturer, distributor, and retailer details -->
+              <div class="col-md-6">
+                  <p id="manufacturerDetails">Manufacturer details are being gathered...</p>
+                  <p id="distributorDetails">Obtaining distributor information...</p>
+                  <p id="retailerDetails">Retrieving retailer data...</p>
+              </div>
+          </div>
+      
+          <!-- Full-width row for processing stage -->
+          <div class="row">
+              <div class="col-12">
+                  <b id="processingStage">Determining current processing stage...</b>
+              </div>
+          </div>
+      </div>
+      
+      </div>
+  </div>
 </div>
+
+
+  <!-- Column for the product ID form -->
+  <div class="col-md-12">
+      <form action="{% url 'show_product_details' product_id=0 %}" method="GET" id="productIDForm" class="mt-3">
+          <label for="productIDInput">Enter Product ID:</label>
+          <input type="number" class="form-control" id="productIDInput" name="productID" required><br>
+          <button type="submit" class="btn btn-primary" id="viewProductButton">View Product</button>
+      </form>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 
 <script>
@@ -54,564 +81,563 @@
           console.log("Web3 initialized and accounts requested.");
 
           const rolecontractABI = [
-            {
-              "inputs": [],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "DIS",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "MAN",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "Owner",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "RET",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addDistributor",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addManufacturer",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addRetailer",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "disCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "manCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "retCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            }
-          ]
-
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "DIS",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "MAN",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "Owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "RET",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addDistributor",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addManufacturer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addRetailer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "disCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "retCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
           rolecontract = new web3.eth.Contract(rolecontractABI, '0x315FF1B4Fa64F0aC9eD6aEc30Aa11886E8d92Aeb');
           console.log("Role Management Contract initialized.");
 
           const productcontractABI = [
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "DIS",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "MAN",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "Owner",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "ProductStock",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "description",
-                  "type": "string"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "price",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "imageHash",
-                  "type": "string"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "MANid",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "DISid",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "RETid",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "enum ProductManagement.STAGE",
-                  "name": "stage",
-                  "type": "uint8"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "name": "RET",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "place",
-                  "type": "string"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addDistributor",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addManufacturer",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_description",
-                  "type": "string"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "_price",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_imageHash",
-                  "type": "string"
-                }
-              ],
-              "name": "addProduct",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "_address",
-                  "type": "address"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_name",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "_place",
-                  "type": "string"
-                }
-              ],
-              "name": "addRetailer",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "disCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "manCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "productCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "retCtr",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            }
-          ]
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "DIS",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "MAN",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "Owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductStock",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "imageHash",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "MANid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "DISid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "RETid",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum ProductManagement.STAGE",
+				"name": "stage",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "RET",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "place",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addDistributor",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addManufacturer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_imageHash",
+				"type": "string"
+			}
+		],
+		"name": "addProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_place",
+				"type": "string"
+			}
+		],
+		"name": "addRetailer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "disCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "productCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "retCtr",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
           productcontract = new web3.eth.Contract(productcontractABI, '0xE17b12feDa856174ddB941915ca5B817A9706017');
           console.log("Product Management Contract initialized.");
 
@@ -633,10 +659,11 @@
             document.getElementById('productName').innerHTML = `Name: ${data.product_name}`;
             document.getElementById('productDescription').innerHTML = `Description: ${data.product_description}`;
             document.getElementById('productPrice').innerHTML = `Price: ${data.product_price} wei`;
-            document.getElementById('manufacturerDetails').innerHTML = `Name: ${data.MANname} <br> Place: ${data.MANplace}`;
-            document.getElementById('distributorDetails').innerHTML = `Name: ${data.DISname} <br> Place: ${data.DISplace}`;
-            document.getElementById('retailerDetails').innerHTML = `Name: ${data.RETname} <br> Place: ${data.RETplace}`;
+            document.getElementById('manufacturerDetails').innerHTML = `Manufacturer Name: ${data.MANname} <br> Place: ${data.MANplace}`;
+            document.getElementById('distributorDetails').innerHTML = `Distributor Name: ${data.DISname} <br> Place: ${data.DISplace}`;
+            document.getElementById('retailerDetails').innerHTML = `Retailer Name: ${data.RETname} <br> Place: ${data.RETplace}`;
             document.getElementById('processingStage').innerHTML = data.processing_stage;
+            document.getElementById('productImage').src = data.product_image_url;  // Update image source
         })
         .catch(error => console.error('Error fetching product details:', error));
     }
@@ -661,7 +688,7 @@
 
 </script>
 
-{% endblock content %}
+{% endblock %}
 
 <div class="py-6 px-6 text-center">
     <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank"

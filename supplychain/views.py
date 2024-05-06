@@ -1,4 +1,4 @@
-import os
+import os, json, requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -7,40 +7,36 @@ from django.views.decorators.http import require_http_methods
 from .ethereum_utils import get_web3_connection, get_contract_instance, send_transaction
 from .models import User, Product, Register
 from django.shortcuts import render, redirect
-import requests
 from .forms import AddEntityForm, AddProductForm, LoginForm, RegisterForm, CreateUserForm
 
 
 web3 = get_web3_connection()
+def get_project_root():
+    return os.path.dirname(os.path.dirname(__file__))
 
-project_directory = os.path.dirname(os.path.dirname(__file__))
-contracts_directory = os.path.join(project_directory, 'contracts')
+def get_contract_instance(web3, contract_address, abi_filename):
+    abi_path = os.path.join(get_project_root(), 'assets', 'contracts', abi_filename)
+    try:
+        with open(abi_path, 'r') as abi_file:
+            contract_abi = json.load(abi_file)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"ABI file not found at {abi_path}")
+    
+    return web3.eth.contract(address=contract_address, abi=contract_abi)
 
 account_from = {
             "private_key": "8385157bb56738af6c00963de326373848fa55cfbe7082117801f3e96dcaac25",
             "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
         }
-
+# Product Contract Setup
 productcontract_address = '0xE17b12feDa856174ddB941915ca5B817A9706017'
 productabi_filename = 'ProductManagementABI.json'
-productabi_path = os.path.join(contracts_directory, productabi_filename)
-productcontract = get_contract_instance(web3, productcontract_address, productabi_path)
+productcontract = get_contract_instance(web3, productcontract_address, productabi_filename)
 
-
+# Role Contract Setup
 rolecontract_address = '0x315FF1B4Fa64F0aC9eD6aEc30Aa11886E8d92Aeb'
 roleabi_filename = 'RoleManagementABI.json'
-roleabi_path = os.path.join(contracts_directory, roleabi_filename)
-rolecontract = get_contract_instance(web3, rolecontract_address, roleabi_path)
-
-# def add_entity_to_blockchain(entity_type, address, name, place):
-#     try:
-#         function_name = f'add{entity_type}'
-#         args = [address, name, place]
-#         tx_hash = send_transaction(web3, contract, function_name, args, account_from['address'], account_from['private_key'])
-#         return {'success': True, 'transaction_hash': tx_hash}
-#     except Exception as e:
-#         return {'success': False, 'error': str(e)}
-    
+rolecontract = get_contract_instance(web3, rolecontract_address, roleabi_filename)
 
 def pin_image_to_ipfs(image_file):
     url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
@@ -74,11 +70,9 @@ def add_product(request):
             # Call blockchain function
             result = add_product_to_blockchain(_name, _description, _price, ipfs_hash)
             if result['success']:
-                print(result)
-                return redirect('success_url')  # Make sure 'success_url' is defined in your urls.py
+                return JsonResponse({'success': True, 'message': 'Product added successfully!'})
             else:
-                # Handle the error, maybe show a message to the user
-                pass
+                return JsonResponse({'success': False, 'error': result['error']})
     else:
         form = AddProductForm()
 
@@ -100,13 +94,14 @@ def show_product_details(request, product_id):
             3: "Retailing Stage",
             4: "Sold",
         }
-        current_stage_number = int(product[7])
+        current_stage_number = int(product[8])
         context = {
             'product_id': product[0],
             'product_name': product[1],
             'product_description': product[2],
             'product_price': product[3],
-            'processing_stage': stage_descriptions.get(current_stage_number, "Unknown Stage"),
+            'product_image_url': f'https://amethyst-realistic-camel-859.mypinata.cloud/ipfs/{product[4]}'+'?pinataGatewayToken=MgL8ssK-torTK_vfvilq04TZ6BpK1cdpQFCc6fRLD-K8dQ4g8f2SplukNJ-sGXrJ',
+			'processing_stage': stage_descriptions.get(current_stage_number, "Unknown Stage"),
         }
 
         # Function to get user details from the blockchain
@@ -123,9 +118,7 @@ def show_product_details(request, product_id):
                 return "Invalid Type", "Invalid Type"
             return userdetails[2], userdetails[3] 
 
-        man_id, dis_id, ret_id = product[4], product[5], product[6]
-        print(f"Product data from blockchain: {product}")
-        print(f"Manufacturer ID: {man_id}")
+        man_id, dis_id, ret_id = product[5], product[6], product[7]
 
         context['MANname'], context['MANplace'] = get_user_details(man_id, 'MAN')
         context['DISname'], context['DISplace'] = get_user_details(dis_id, 'DIS')

@@ -1,36 +1,41 @@
 {% extends 'base.html' %}
-{% block heading %}Add Product Order{% endblock heading %}
+{% block heading %}Order Product{% endblock heading %}
 {% block content %}
-      <div class="card">
-        <div class="card-body">
-          <form id="productForm" method="post" action="{% url 'add_product' %}" class="product-form">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="currentAccount" class="form-label"><b>Current Account Address:</b></label>
-              <span id="currentAccount"></span>
-            </div>
-            <div class="mb-3">
-              <label for="id_name" class="form-label">Name</label>
-              <input type="text" class="form-control" id="id_name" name="name" maxlength="100" required>
-            </div>
-            <div class="mb-3">
-              <label for="id_description" class="form-label">Description</label>
-              <textarea class="form-control" id="id_description" name="description" maxlength="500" required></textarea>
-              <div id="descriptionHelp" class="form-text">Provide a brief description of the product.</div>
-            </div>
-            <div class="mb-3">
-              <label for="id_price" class="form-label">Price</label>
-              <input type="number" class="form-control" id="id_price" name="price" step="0.01" required>
-              <div id="priceHelp" class="form-text">Set the price of the product.</div>
-            </div>
-            <div class="mb-3">
-              <label for="id_image" class="form-label">Product Image</label>
-              <input type="file" class="form-control" id="id_image" name="image" accept="image/*" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-        </div>
-      </div>
+	<div class="card">
+		<div class="card-body">
+			<form id="productForm" method="post" enctype="multipart/form-data" class="product-form">
+				{% csrf_token %}
+				<div class="mb-3">
+					<label for="currentAccount" class="form-label"><b>Current Account Address:</b></label>
+					<span id="currentAccount"></span>
+				</div>
+				<div class="mb-3">
+					<label for="id_name" class="form-label">Name</label>
+					<input type="text" class="form-control" id="id_name" name="name" maxlength="100" required>
+				</div>
+				<div class="mb-3">
+					<label for="id_description" class="form-label">Description</label>
+					<textarea class="form-control" id="id_description" name="description" maxlength="500"
+						required></textarea>
+					<div id="descriptionHelp" class="form-text">Provide a brief description of the product.</div>
+				</div>
+				<div class="mb-3">
+					<label for="id_price" class="form-label">Price</label>
+					<input type="number" class="form-control" id="id_price" name="price" step="0.01" required>
+					<div id="priceHelp" class="form-text">Set the price of the product.</div>
+				</div>
+				<div class="mb-3">
+					<label for="id_image" class="form-label">Product Image</label>
+					<input type="file" class="form-control" id="id_image" name="image" accept="image/*" required>
+				</div>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+		</div>
+	</div>
+	
+	<div class="alert alert-success" role="alert" style="display:none;" id="successAlert"></div>
+	<div class="alert alert-danger" role="alert" style="display:none;" id="errorAlert"></div>
+
 
 <div id="app">
     <h5>Ordered Products:</h5>
@@ -377,6 +382,7 @@ contractABI = [
 		"type": "function"
 	}
 ]
+
 let contract;
 const web3 = new Web3(window.ethereum);
 const form = document.getElementById('addProductForm');
@@ -384,43 +390,60 @@ let currentAccount = null;
 const prodTableBody = document.getElementById('prodTableBody');
 
 async function initWeb3() {
-if (window.ethereum) {
-	window.web3 = new Web3(window.ethereum);
-	console.log("Web3 initialized.");
-	try {
-		await window.ethereum.request({ method: 'eth_requestAccounts' });
-		console.log("Accounts requested.");
-		const accounts = await web3.eth.getAccounts();
-		console.log("Accounts retrieved:", accounts);
-		if (accounts.length > 0) {
-			currentAccount = accounts[0];
-			console.log("Current Account:", currentAccount);
-			document.getElementById('currentAccount').innerText = `${currentAccount}`;
-			contract = new web3.eth.Contract(contractABI, '0xE17b12feDa856174ddB941915ca5B817A9706017');
-			console.log("Contract initialized:", contract);
-		} else {
-			console.error("No accounts found.");
+	if (window.ethereum) {
+		window.web3 = new Web3(window.ethereum);
+		console.log("Web3 initialized.");
+		try {
+			await window.ethereum.request({ method: 'eth_requestAccounts' });
+			console.log("Accounts requested.");
+			const accounts = await web3.eth.getAccounts();
+			console.log("Accounts retrieved:", accounts);
+			if (accounts.length > 0) {
+				currentAccount = accounts[0];
+				console.log("Current Account:", currentAccount);
+				document.getElementById('currentAccount').innerText = `${currentAccount}`;
+				contract = new web3.eth.Contract(contractABI, '0xE17b12feDa856174ddB941915ca5B817A9706017');
+				console.log("Contract initialized:", contract);
+			} else {
+				console.error("No accounts found.");
+			}
+		} catch (error) {
+			console.error("Could not get accounts", error);
 		}
-      } catch (error) {
-          console.error("Could not get accounts", error);
-      }
-  } else {
-      console.error("Ethereum object not found. Make sure you have a web3 provider.");
-  }
+	} else {
+		console.error("Ethereum object not found. Make sure you have a web3 provider.");
+	}
 }
 
 document.getElementById('productForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('id_name').value;
-    const description = document.getElementById('id_description').value;
-    const price = document.getElementById('id_price').value; // Get the price value from the form
-    try {
-        // Send the price as well along with name and description
-        await contract.methods['addproduct'](name, description, price).send({ from: currentAccount });
-        console.log('Product added successfully');
-    } catch (error) {
-        console.error('Failed to add product', error);
-    }
+    const formData = new FormData(e.target);
+	const csrftoken = formData.get('csrfmiddlewaretoken');
+    fetch("{% url 'add_product' %}", {
+    method: 'POST',
+    body: formData,
+    headers: {
+      "X-CSRFToken": csrftoken,
+    },
+  }).then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const successAlert = document.getElementById('successAlert');
+        successAlert.innerText = data.message;
+        successAlert.style.display = 'block';
+        setTimeout(() => successAlert.style.display = 'none', 5000); // Hide after 5 seconds
+      } else {
+        const errorAlert = document.getElementById('errorAlert');
+        errorAlert.innerText = data.error;
+        errorAlert.style.display = 'block';
+        setTimeout(() => errorAlert.style.display = 'none', 5000); // Hide after 5 seconds
+      }
+    }).catch(error => {
+      const errorAlert = document.getElementById('errorAlert');
+      errorAlert.innerText = 'Network error or server is unreachable.';
+      errorAlert.style.display = 'block';
+      setTimeout(() => errorAlert.style.display = 'none', 5000); // Hide after 5 seconds
+    });
 });
 
 async function loadProducts() {

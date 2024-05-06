@@ -780,7 +780,7 @@
 			for (let i = 1; i <= productCount; i++) {
 				const product = await productManagementContract.methods.ProductStock(i).call();
 				if (product.stage === "3") { // "3" corresponds to the Retail stage in the enum
-					const ipfsImageUrl = `https://amethyst-realistic-camel-859.mypinata.cloud/ipfs/${product.imageHash}`;
+					const ipfsImageUrl = `https://amethyst-realistic-camel-859.mypinata.cloud/ipfs/${product.imageHash}?pinataGatewayToken=MgL8ssK-torTK_vfvilq04TZ6BpK1cdpQFCc6fRLD-K8dQ4g8f2SplukNJ-sGXrJ`;
 					const productElement = `<div class="col mb-5">
                         <div class="product-card position-relative">
                             <div class="image-holder">
