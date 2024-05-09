@@ -1,4 +1,5 @@
 import os, json, requests
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -26,32 +27,35 @@ def get_contract_instance(web3, contract_address, abi_filename):
     return web3.eth.contract(address=Web3.to_checksum_address(contract_address), abi=contract_abi)
 
 account_from = {
-            "private_key": "0x03A32745d16f0dA8Bbbb05479BF20E5b26f9dCfF",
-            "address": '0xb30E2F234958fb7A5D4D3D1c08395B81C7a51803',
+            "private_key": "0x1daed4c35596cef9987e4e4bcf45c58d1952dbe7bb679506ead491dbbf2e579f",
+            "address": '0x3f46FE5766AA1D350512d75C4A67176611140391',
         }
-# Product Contract Setup
-contract_address = '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6'
+# Product Contract Setupaw
+contract_address = '0xf4BFCE0A5B51afb70F5FA63181644F85637d1c02'
 abi_filename = 'TransactionManagementABI.json'
 contract = get_contract_instance(web3, contract_address, abi_filename)
 
+@csrf_exempt  # Use cautiously, ensure proper CSRF handling
+def pin_image_to_ipfs(request):
+    if request.method == 'POST' and request.FILES:
+        image_file = request.FILES.get('image_file')
+        if image_file:
+            url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
+            headers = {
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJkYTk2OTc4ZS02NWJiLTQwOGEtYTAzMS0yZGFhN2ViY2IyMDMiLCJlbWFpbCI6ImpvZWxzYW1qb2huc29uQHlhaG9vLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfSx7ImlkIjoiTllDMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJiYTViNDljZDljOTUyY2JiNzhlYSIsInNjb3BlZEtleVNlY3JldCI6ImY5ZmIzMDg3MTE1Y2Y2MWVkOTk0YWZiOTVhZjYzNWQwZjgyOGUzOGIzNzlhNGViOGE2ZDhhNGQ4OWI0NzJjYjIiLCJpYXQiOjE3MTQ4ODUyNzd9.LnfSkclSo3E5WygrsMwkVieZGot00R0yBlFkxMWF5Sc"  # Replace YOUR_API_KEY with the actual key
+            }
+            files = {'file': (image_file.name, image_file, image_file.content_type)}
+            response = requests.post(url, files=files, headers=headers)
+            if response.status_code == 200:
+                ipfs_hash = response.json().get('IpfsHash')
+                return JsonResponse({'success': True, 'ipfs_hash': ipfs_hash})
+            else:
+                return JsonResponse({'success': False, 'error': 'Failed to pin image'}, status=500)
+        else:
+            return JsonResponse({'error': 'No image file provided'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method or no file found'}, status=400)
 
-def pin_image_to_ipfs(image_file):
-    url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
-    headers = {"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJkYTk2OTc4ZS02NWJiLTQwOGEtYTAzMS0yZGFhN2ViY2IyMDMiLCJlbWFpbCI6ImpvZWxzYW1qb2huc29uQHlhaG9vLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfSx7ImlkIjoiTllDMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJiYTViNDljZDljOTUyY2JiNzhlYSIsInNjb3BlZEtleVNlY3JldCI6ImY5ZmIzMDg3MTE1Y2Y2MWVkOTk0YWZiOTVhZjYzNWQwZjgyOGUzOGIzNzlhNGViOGE2ZDhhNGQ4OWI0NzJjYjIiLCJpYXQiOjE3MTQ4ODUyNzd9.LnfSkclSo3E5WygrsMwkVieZGot00R0yBlFkxMWF5Sc"}
-    files = {'file': (image_file.name, image_file, 'multipart/form-data')}
-    response = requests.post(url, files=files, headers=headers)
-    ipfs_hash = response.json().get('IpfsHash')
-    return ipfs_hash
-
-def add_product_to_blockchain(name, description, price, ipfs_hash):
-    try:
-        function_name = 'addproduct'
-        args = [name, description, price, ipfs_hash]
-        # Ensure that `send_transaction` is capable of handling the connection and sending data to the blockchain
-        tx_hash = send_transaction(web3, contract, function_name, args, account_from['address'], account_from['private_key'])
-        return {'success': True, 'transaction_hash': tx_hash}
-    except Exception as e:
-        return {'success': False, 'error': str(e)}
 
 def add_product(request):
     if request.method == "POST":
@@ -61,19 +65,28 @@ def add_product(request):
             _description = form.cleaned_data['description']
             _price = form.cleaned_data['price']
             _image = request.FILES['image']
-            ipfs_hash = pin_image_to_ipfs(_image)
-            Product.objects.create(name=_name, description=_description, price=_price)
-
-            # Call blockchain function
-            result = add_product_to_blockchain(_name, _description, _price, ipfs_hash)
-            if result['success']:
-                return JsonResponse({'success': True, 'message': 'Product added successfully!'})
-            else:
-                return JsonResponse({'success': False, 'error': result['error']})
+            Product.objects.create(name=_name, description=_description, price=_price, image=_image)
     else:
         form = AddProductForm()
+    
+     # Fetch product details from the blockchain
+    products = []
+    prod_ctr = contract.functions.productCtr().call()
+    for i in range(1, prod_ctr + 1):  # Ensure the range starts at 1
+        product = contract.functions.ProductStock(i).call()
+        products.append({
+            'id': product[0],
+            'name': product[1],
+            'description': product[2],
+            'price': product[3],
+            'image_hash': product[4],
+            'MANid': product[5],
+            'DISid': product[6],
+            'RETid': product[7],
+            'stage': product[8],
+        })
 
-    return render(request, 'add_order.html', {'form': form})
+    return render(request, 'add_order.html', {'products': products, 'form': form})
 
 def product_details_initial(request):
     # This view just renders the template initially without product details.
@@ -218,7 +231,22 @@ def supply_login(request):
 
 
 def supply(request):
-    return render(request, 'supply.html')
+    products = []
+    prod_ctr = contract.functions.productCtr().call()
+    for i in range(1, prod_ctr + 1):  # Ensure the range starts at 1
+        product = contract.functions.ProductStock(i).call()
+        products.append({
+            'id': product[0],
+            'name': product[1],
+            'description': product[2],
+            'price': product[3],
+            'image_hash': product[4],
+            'MANid': product[5],
+            'DISid': product[6],
+            'RETid': product[7],
+            'stage': product[8],
+        })
+    return render(request, 'supply.html', {'products':products})
 
 def track_product(request):
     return render(request, 'track_product.html')
@@ -228,7 +256,21 @@ def manage(request):
 
 @login_required(login_url='customer_login')
 def customer_home(request):
-    return render(request, 'custom_home.html')
+    product_count = contract.functions.productCtr().call()
+
+    products = []
+    for i in range(1, product_count + 1):
+        product = contract.functions.ProductStock(i).call()
+        if product[8] == 3:  # Assuming stage is returned as int
+            product_data = {
+                'id': i,
+                'name': product[1],
+                'price': product[3],
+                'imageHash': product[4],
+            }
+            products.append(product_data)
+
+    return render(request, 'custom_home.html', {'products': products})
 
 def customer_register(request):
     form = CreateUserForm()

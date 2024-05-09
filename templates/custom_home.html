@@ -4,19 +4,41 @@
 
 {% block content %}
 <section id="mobile-products" class="product-store position-relative padding-large no-padding-top">
-    <div class="container">
-        <div class="row">
-            <div class="display-header d-flex justify-content-between pb-3">
-                <h2 class="display-7 text-dark text-uppercase">Textile Products</h2>
-            </div>
-            <div class="container px-4 px-lg-5 mt-5">
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" id="product-list">
-                    <!-- Products will be loaded here dynamically -->
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="swiper-pagination position-absolute text-center"></div>
+	<div class="container">
+		<div class="row">
+			<div class="display-header d-flex justify-content-between pb-3">
+				<h2 class="display-7 text-dark text-uppercase">Textile Products</h2>
+			</div>
+			<div class="container px-4 px-lg-5 mt-5">
+				<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center"
+					id="product-list">
+					{% for product in products %}
+					<div class="col mb-5">
+						<div class="product-card position-relative">
+							<div class="image-holder">
+								<!-- IPFS image loaded here -->
+								<img src="https://amethyst-realistic-camel-859.mypinata.cloud/ipfs/{{ product.imageHash }}?pinataGatewayToken=MgL8ssK-torTK_vfvilq04TZ6BpK1cdpQFCc6fRLD-K8dQ4g8f2SplukNJ-sGXrJ"
+									alt="{{ product.name }}" class="img-fluid">
+							</div>
+							<div class="card-detail d-flex justify-content-between align-items-baseline pt-3">
+								<h3 class="card-title text-uppercase">{{ product.name }}</h3>
+								<span class="item-price text-primary">{{ product.price }} wei</span>
+							</div>
+							<div class="cart-concern position-absolute">
+								<div class="cart-button d-flex justify-content-center">
+									<button class="btn btn-medium btn-black"
+										onclick="purchaseProduct({{ product.id }}, {{ product.price }})">Buy</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="swiper-pagination position-absolute text-center"></div>
 </section>
 <script>
 	window.onload = function () {
@@ -419,64 +441,11 @@
 		"type": "function"
 	}
 ]
-	let contract;
-	let web3;
+	const web3 = new Web3(window.ethereum);
+    const contractAddress = '0xf4BFCE0A5B51afb70F5FA63181644F85637d1c02';
+    
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-	if (window.ethereum) {
-		web3 = new Web3(window.ethereum);
-		initWeb3();
-	} else {
-		console.error("Please install MetaMask!");
-	}
-
-	async function initWeb3() {
-		try {
-			await window.ethereum.request({ method: 'eth_requestAccounts' });
-	contract = new web3.eth.Contract(contractABI, '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6')
-			console.log('contract instantiated')
-			loadAvailableProducts();
-		} catch (error) {
-			console.error("Web3 initialization error:", error);
-		}
-	}
-
-	async function loadAvailableProducts() {
-		try {
-			const productCount = await contract.methods.productCtr().call();
-			const productsContainer = document.getElementById('product-list');
-			productsContainer.innerHTML = '';
-
-			for (let i = 1; i <= productCount; i++) {
-				const product = await contract.methods.ProductStock(i).call();
-				if (product.stage === "3") { // "3" corresponds to the Retail stage in the enum
-					const ipfsImageUrl = `https://amethyst-realistic-camel-859.mypinata.cloud/ipfs/${product.imageHash}?pinataGatewayToken=MgL8ssK-torTK_vfvilq04TZ6BpK1cdpQFCc6fRLD-K8dQ4g8f2SplukNJ-sGXrJ`;
-					const productElement = `<div class="col mb-5">
-                        <div class="product-card position-relative">
-                            <div class="image-holder">
-                              <!-- IPFS image loaded here -->
-                              <img src="${ipfsImageUrl}" alt="${product.name}" class="img-fluid">
-                            </div>
-                            <div class="card-detail d-flex justify-content-between align-items-baseline pt-3">
-                                <h3 class="card-title text-uppercase">
-                                    ${product.name}
-                                </h3>
-                                <span class="item-price text-primary">${product.price} wei</span>
-                            </div>
-                            <div class="cart-concern position-absolute">
-                                <div class="cart-button d-flex justify-content-center">
-                                    <button class="btn btn-medium btn-black" onclick="purchaseProduct(${product.id}, ${product.price})">Buy</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-					productsContainer.innerHTML += productElement;
-				}
-			}
-		} catch (error) {
-			console.error("Failed to load products:", error);
-		}
-	}
 	async function purchaseProduct(productId, productPrice) {
 		try {
 			const accounts = await web3.eth.getAccounts();
@@ -485,7 +454,6 @@
 				value: productPrice
 			});
 			alert(`Purchase successful!`);
-			loadAvailableProducts(); // Refresh the list after purchase
 		} catch (error) {
 			console.error("Purchase failed:", error);
 			alert(`Purchase failed: ${error.message}`);

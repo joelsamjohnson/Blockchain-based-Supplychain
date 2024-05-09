@@ -1,480 +1,535 @@
 {% extends 'base.html' %}
-{% block heading %}Order Product{% endblock heading %}
+{% block heading %}{% endblock heading %}
 {% block content %}
-	<div class="card">
-		<div class="card-body">
-			<form id="addProductForm" method="post" action="{% url 'add_product' %}" enctype="multipart/form-data" class="product-form">
-				{% csrf_token %}
-				<div class="mb-3">
-					<label for="currentAccount" class="form-label"><b>Current Account Address:</b></label>
-					<span id="currentAccount"></span>
-				</div>
-				<div class="mb-3">
-					<label for="id_name" class="form-label">Name</label>
-					<input type="text" class="form-control" id="id_name" name="name" maxlength="100" required>
-				</div>
-				<div class="mb-3">
-					<label for="id_description" class="form-label">Description</label>
-					<textarea class="form-control" id="id_description" name="description" maxlength="500"
-						required></textarea>
-					<div id="descriptionHelp" class="form-text">Provide a brief description of the product.</div>
-				</div>
-				<div class="mb-3">
-					<label for="id_price" class="form-label">Price</label>
-					<input type="number" class="form-control" id="id_price" name="price" step="0.01" required>
-					<div id="priceHelp" class="form-text">Set the price of the product.</div>
-				</div>
-				<div class="mb-3">
-					<label for="id_image" class="form-label">Product Image</label>
-					<input type="file" class="form-control" id="id_image" name="image" accept="image/*" required>
-				</div>
-				<button type="submit" class="btn btn-primary">Submit</button>
-			</form>
-		</div>
-	</div>
-	
-	<div class="alert alert-success" role="alert" style="display:none;" id="successAlert"></div>
-	<div class="alert alert-danger" role="alert" style="display:none;" id="errorAlert"></div>
+<h5 class="card-title fw-semibold mb-4">Order Product</h5>
+<div class="card">
+  <div class="card-body">
+    <form id="addProductForm" method="post" action="{% url 'add_product' %}" enctype="multipart/form-data" class="product-form">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="id_name" name="name" maxlength="100" required>
+      </div>
+      <div class="mb-3">
+        <label for="id_description" class="form-label">Description</label>
+        <textarea class="form-control" id="id_description" name="description" maxlength="500"
+          required></textarea>
+        <div id="descriptionHelp" class="form-text">Provide a brief description of the product.</div>
+      </div>
+      <div class="mb-3">
+        <label for="id_price" class="form-label">Price</label>
+        <input type="number" class="form-control" id="id_price" name="price" step="0.01" required>
+        <div id="priceHelp" class="form-text">Set the price of the product.</div>
+      </div>
+      <div class="mb-3">
+        <label for="id_image" class="form-label">Product Image</label>
+        <input type="file" class="form-control" id="id_image" name="image" accept="image/*" required>
+      </div>
+      <button type="submit" class="ethereumButton btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
 
+<div class="alert alert-success" role="alert" style="display:none;" id="successAlert"></div>
+<div class="alert alert-danger" role="alert" style="display:none;" id="errorAlert"></div>
 
-<div id="app">
-    <h5>Ordered Products:</h5>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-				<th scope="col">Price</th>
-                <th scope="col">Current Stage</th>
-            </tr>
-        </thead>
-        <tbody id="prodTableBody">
-            <!-- Products will be added here -->
-        </tbody>
-    </table>
+<h5 class="card-title fw-semibold mb-4">Products</h5>
+<div class="table-responsive">
+  <table class="table text-nowrap mb-0 align-middle">
+    <thead class="text-dark fs-4">
+    <tr>
+      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">ID</h6></th>
+      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Name</h6></th>
+      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Description</h6></th>
+      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Price</h6></th>
+      <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Processing Stage</h6></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+    <tr>
+      <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ product.id }}</h6></td>
+      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ product.name }}</p></td>
+      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ product.description }}</p></td>
+      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ product.price }}</p></td>
+      <td class="border-bottom-0"><p class="mb-0 fw-normal">{{ product.stage }}</p></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+  </table>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/web3@1.3.0/dist/web3.min.js"></script>
 
 <script>
-contractABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "DIS",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "place",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "MAN",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "place",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "Owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "ProductStock",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "imageHash",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "MANid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "DISid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "RETid",
-				"type": "uint256"
-			},
-			{
-				"internalType": "enum ProductManagement.STAGE",
-				"name": "stage",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "RET",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "place",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_address",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_place",
-				"type": "string"
-			}
-		],
-		"name": "addDistributor",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_address",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_place",
-				"type": "string"
-			}
-		],
-		"name": "addManufacturer",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_description",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_imageHash",
-				"type": "string"
-			}
-		],
-		"name": "addProduct",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_address",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_place",
-				"type": "string"
-			}
-		],
-		"name": "addRetailer",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "disCtr",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "manCtr",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "productCtr",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "retCtr",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
+   
+document.querySelector('.ethereumButton').addEventListener('click', function (e) {
+    e.preventDefault(); // Prevent form from submitting immediately
 
-let contract;
-const web3 = new Web3(window.ethereum);
-const form = document.getElementById('addProductForm');
-let currentAccount = null;
-const prodTableBody = document.getElementById('prodTableBody');
-
-async function initWeb3() {
-	if (window.ethereum) {
-		window.web3 = new Web3(window.ethereum);
-		console.log("Web3 initialized.");
-		try {
-			await window.ethereum.request({ method: 'eth_requestAccounts' });
-			console.log("Accounts requested.");
-			const accounts = await web3.eth.getAccounts();
-			console.log("Accounts retrieved:", accounts);
-			if (accounts.length > 0) {
-				currentAccount = accounts[0];
-				console.log("Current Account:", currentAccount);
-				document.getElementById('currentAccount').innerText = `${currentAccount}`;
-				contract = new web3.eth.Contract(contractABI, '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6');
-				console.log("Contract initialized:", contract);
-			} else {
-				console.error("No accounts found.");
-			}
-		} catch (error) {
-			console.error("Could not get accounts", error);
-		}
-	} else {
-		console.error("Ethereum object not found. Make sure you have a web3 provider.");
-	}
-}
-document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-    e.preventDefault();  // Prevent normal form submission
-    const form = e.target;
-    const formData = new FormData(form);
-    
-    fetch(form.action, {  // Use form.action if your form's action attribute is set to the Django URL
-        method: 'POST',
-        body: formData,
-        headers: {
-            "X-CSRFToken": formData.get('csrfmiddlewaretoken'),  // Assuming CSRF token is part of the form
-        },
-    }).then(response => response.json())  // Convert the response to JSON
-    .then(data => {
-        if (data.success) {
-            alert('Success: ' + data.message);  // Show success message
-        } else {
-            alert('Error: ' + data.error);  // Show error message
-        }
-    }).catch(error => {
-        alert('Network error or server is unreachable: ' + error.message);  // Handle network errors
-    });
-});
-
-async function loadProducts() {
-    const productsCount = await contract.methods.productCtr().call();
-    const tableBody = document.getElementById('prodTableBody'); // Get the tbody element where products will be added
-
-    for (let i = 1; i <= productsCount; i++) {
-        const product = await contract.methods.ProductStock(i).call();
-        const row = tableBody.insertRow(); // Insert a new row in the table
-
-        // Insert cells (`<td>`) and fill them with product data
-        const cellId = row.insertCell(0);
-        cellId.innerHTML = product.id;
-
-        const cellName = row.insertCell(1);
-        cellName.innerHTML = product.name;
-
-        const cellDescription = row.insertCell(2);
-        cellDescription.innerHTML = product.description;
-
-        const cellPrice = row.insertCell(3); // New cell for price
-        cellPrice.innerHTML = product.price;
-
-        const cellStage = row.insertCell(4); // Adjusted index for stage
-        const stageNames = [
-            "Init",
-            "Manufacturing",
-            "Distribution",
-            "Retailing",
-            "Sold"
-        ];
-        cellStage.innerHTML = stageNames[product.stage];
+    if (!window.ethereum) {
+      alert('MetaMask is not installed!');
+      return;
     }
-}
+    
+  contractABI = [{
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "DIS",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "place",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "MAN",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "place",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "Owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProductStock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "imageHash",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "MANid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "DISid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "RETid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ProductManagement.STAGE",
+        "name": "stage",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "RET",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "place",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_place",
+        "type": "string"
+      }
+    ],
+    "name": "addDistributor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_place",
+        "type": "string"
+      }
+    ],
+    "name": "addManufacturer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_description",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_imageHash",
+        "type": "string"
+      }
+    ],
+    "name": "addProduct",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_place",
+        "type": "string"
+      }
+    ],
+    "name": "addRetailer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disCtr",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "manCtr",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "productCtr",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "purchases",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retCtr",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_productID",
+        "type": "uint256"
+      }
+    ],
+    "name": "Manufacturing",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_productID",
+        "type": "uint256"
+      }
+    ],
+    "name": "Distribute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_productID",
+        "type": "uint256"
+      }
+    ],
+    "name": "Retail",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_productID",
+        "type": "uint256"
+      }
+    ],
+    "name": "purchaseProduct",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
+  }
+  ]
+  const web3 = new Web3(window.ethereum);
+  const contractAddress = '0xf4BFCE0A5B51afb70F5FA63181644F85637d1c02';
 
-window.addEventListener('load', async () => {
-  await initWeb3();
-  await loadProducts();
-});
+  const contract = new web3.eth.Contract(contractABI, contractAddress);
+  const name = document.getElementById('id_name').value;
+  const description = document.getElementById('id_description').value;
+  const price = document.getElementById('id_price').value;
+  const image = document.getElementById('id_image').files[0];
 
-// Add more functions to interact with your contract as needed
+  // Request account access if needed
+  window.ethereum.request({ method: 'eth_requestAccounts' })
+    .then(async accounts => {
+      const account = accounts[0];
 
-</script>{% endblock content %}
+      // FormData to append image file
+      var formData = new FormData();
+      formData.append('image_file', image);  // 'image_file' is the name of the field expected by your Django backend
+
+      try {
+        let response = await fetch('/pin-image/', {
+          method: 'POST',
+          body: formData,
+        });
+        let data = await response.json();
+        if (data.success) {
+          const imageHash = data.ipfs_hash;
+          addProductToBlockchain(imageHash);
+        } else {
+          console.error('Error in pinning image:', data.error);
+        }
+      } catch (error) {
+        console.error('Network error:', error);
+      }
+
+      async function addProductToBlockchain(imageHash) {
+        try {
+          const receipt = await contract.methods.addProduct(name, description, price, imageHash).send({ from: account });
+          console.log('Transaction receipt:', receipt);
+          // Display success alert
+          document.getElementById('successAlert').style.display = 'block'; // Show success alert
+        } catch (error) {
+          console.error('Error in transaction:', error);
+          // Display error alert
+          document.getElementById('errorAlert').style.display = 'block'; // Show error alert
+        }
+      }
+    });
+  });
+
+</script>
+{% endblock content %}

@@ -115,7 +115,7 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
       alert('MetaMask is not installed!');
       return;
     }
-   contractABI = [
+	contractABI = [
 	{
 		"inputs": [
 			{
@@ -492,8 +492,8 @@ document.querySelector('.ethereumButton').addEventListener('click', function (e)
 		"type": "function"
 	}
 ]
-   const web3 = new Web3(window.ethereum);
-    const contractAddress = '0xadA3AF5aC641504094B85CF8C0DD8410e86d06d6';
+ 	const web3 = new Web3(window.ethereum);
+    const contractAddress = '0xf4BFCE0A5B51afb70F5FA63181644F85637d1c02';
     
     const contract = new web3.eth.Contract(contractABI, contractAddress);
     const entityType = document.getElementById('id_entity_type').value;
