@@ -31,7 +31,7 @@ account_from = {
             "address": '0x3f46FE5766AA1D350512d75C4A67176611140391',
         }
 # Product Contract Setupaw
-contract_address = '0xf4BFCE0A5B51afb70F5FA63181644F85637d1c02'
+contract_address = '0xF4017D3269A1889049434f895BBB73aa642E8823'
 abi_filename = 'TransactionManagementABI.json'
 contract = get_contract_instance(web3, contract_address, abi_filename)
 
@@ -97,6 +97,10 @@ def product_details_initial(request):
 def show_product_details(request, product_id):
     try:
         product = contract.functions.ProductStock(product_id).call()
+        if product[0] == 0:  # Check if product ID is zero (indicating non-existence)
+            context = {'error': f"Product with ID {product_id} doesn't exist."}
+            return JsonResponse(context)
+        
         stage_descriptions = {
             0: "Product Ordered",
             1: "Manufacturing Stage",
@@ -152,29 +156,29 @@ def add_entity(request):
             User.objects.create(user_type=entity_type, address=address, name=name, place=place)
     else:
         form = AddEntityForm()
-        man = {}
-        man_ctr = contract.functions.manCtr().call()
-        for i in range(man_ctr):
-            man[i] = contract.functions.MAN(i + 1).call()
-            print(man[i])
+    man = {}
+    man_ctr = contract.functions.manCtr().call()
+    for i in range(man_ctr):
+        man[i] = contract.functions.MAN(i + 1).call()
+        print(man[i])
 
-        dis = {}
-        dis_ctr = contract.functions.disCtr().call()
-        for i in range(dis_ctr):
-            dis[i] = contract.functions.DIS(i + 1).call()
-            print(dis[i])
+    dis = {}
+    dis_ctr = contract.functions.disCtr().call()
+    for i in range(dis_ctr):
+        dis[i] = contract.functions.DIS(i + 1).call()
+        print(dis[i])
 
-        ret = {}
-        ret_ctr = contract.functions.retCtr().call()
-        for i in range(ret_ctr):
-            ret[i] = contract.functions.RET(i + 1).call()
-            print(ret[i])
+    ret = {}
+    ret_ctr = contract.functions.retCtr().call()
+    for i in range(ret_ctr):
+        ret[i] = contract.functions.RET(i + 1).call()
+        print(ret[i])
 
-        return render(request, 'register_user.html', {
-            'man': man,
-            'dis': dis,
-            'ret': ret, 'form': form
-        })
+    return render(request, 'register_user.html', {
+        'man': man,
+        'dis': dis,
+        'ret': ret, 'form': form
+    })
 
 
 def register(request):
